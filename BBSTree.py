@@ -36,30 +36,21 @@ class BBSTree():
     def buildStructure(self, datapoints, subroot: Node = None):
         if len(datapoints) == 0:
             return subroot
-        mid = len(datapoints)//2 - (len(datapoints)+1)%2
+        mid = len(datapoints)//2
         leftpoints = datapoints[:mid]
         rightpoints = datapoints[mid+1:]
-        if self.root is None:
-            self.root = Node(datapoints[mid])
-            if subroot is None:
-                subroot = self.root
-            subroot.leftChild = self.buildStructure(leftpoints, subroot.leftChild)
-            subroot.rightChild = self.buildStructure(rightpoints, subroot.rightChild)
-        else:
-            if subroot is None:
-                subroot = self.root
-            subroot = Node(datapoints[mid])
-            subroot.leftChild = self.buildStructure(leftpoints, subroot.leftChild)
-            subroot.rightChild = self.buildStructure(rightpoints, subroot.rightChild)
+        subroot = Node(datapoints[mid])
+        subroot.leftChild = self.buildStructure(leftpoints, subroot.leftChild)
+        subroot.rightChild = self.buildStructure(rightpoints, subroot.rightChild)
         return subroot
 
     def buildLeafs(self, datapoints):
-        for leaf in datapoints:
-            self.insert(Node(leaf), self.root)
+        for point in datapoints:
+            self.insert(Node(point), self.root)
 
     def build(self, datapoints):
         datapoints = sorted(datapoints)
-        self.buildStructure(datapoints)
+        self.root = self.buildStructure(datapoints)
         self.buildLeafs(datapoints)
 
     def insert(self, newNode: Node, subroot: Node = None):
@@ -116,7 +107,7 @@ class BBSTree():
                 self.printTree(child)
 
 if __name__ == "__main__":
-    datapoints = [1,3,2,4,5,6,7,8,9,10]
+    datapoints = [1,3,2,4,5,6,7,8,9]
     tree = BBSTree()
     tree.build(datapoints)
     tree.printTree()
