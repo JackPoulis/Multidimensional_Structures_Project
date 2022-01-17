@@ -1,5 +1,12 @@
 import numpy as np
 
+#TO DO:
+#Build DONE
+#Insert
+#Delete
+#Update?
+#Search
+
 class Node():
     def __init__(self, value, leftC = None, rightC = None):
         self.leftChild: Node = leftC
@@ -36,7 +43,7 @@ class BBSTree():
     def buildStructure(self, datapoints, subroot: Node = None):
         if len(datapoints) == 0:
             return subroot
-        mid = len(datapoints)//2
+        mid = (len(datapoints)-1)//2
         leftpoints = datapoints[:mid]
         rightpoints = datapoints[mid+1:]
         subroot = Node(datapoints[mid])
@@ -54,6 +61,7 @@ class BBSTree():
         self.buildLeafs(datapoints)
 
     def insert(self, newNode: Node, subroot: Node = None):
+
         if self.root is None:
             self.root = newNode
             return
@@ -107,7 +115,7 @@ class BBSTree():
                 self.printTree(child)
 
 if __name__ == "__main__":
-    datapoints = [1,3,2,4,5,6,7,8,9]
+    datapoints = [6,7,8,9,10]
     tree = BBSTree()
     tree.build(datapoints)
     tree.printTree()
