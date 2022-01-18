@@ -21,7 +21,7 @@ class Node():
             return True
 
     def printNode(self):
-        print('Data:\t',self.value)
+        print('Data:\t', self.value)
         if self.leftChild:
             print('Left:\t', self.leftChild.value)
         if self.rightChild:
