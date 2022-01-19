@@ -2,10 +2,8 @@ import numpy as np
 
 #TO DO:
 #Build DONE
-#Insert
-#Delete
-#Update?
 #Search
+#Range Search
 
 class Node():
     def __init__(self, value, leftC = None, rightC = None):
@@ -53,14 +51,14 @@ class BBSTree():
 
     def buildLeafs(self, datapoints):
         for point in datapoints:
-            self.insert(Node(point), self.root)
+            self.insertLeaf(Node(point), self.root)
 
     def build(self, datapoints):
         datapoints = sorted(datapoints)
         self.root = self.buildStructure(datapoints)
         self.buildLeafs(datapoints)
 
-    def insert(self, newNode: Node, subroot: Node = None):
+    def insertLeaf(self, newNode: Node, subroot: Node = None):
 
         if self.root is None:
             self.root = newNode
@@ -70,17 +68,14 @@ class BBSTree():
             subroot = self.root
         if newNode.value > subroot.value:
             if subroot.rightChild:
-                self.insert(newNode, subroot.rightChild)
+                self.insertLeaf(newNode, subroot.rightChild)
             else:
                 subroot.rightChild = newNode
         else:
             if subroot.leftChild:
-                self.insert(newNode, subroot.leftChild)
+                self.insertLeaf(newNode, subroot.leftChild)
             else:
                 subroot.leftChild = newNode
-        
-    def delete(self):
-        return 0
 
     def search(self, value, node=None):
         if node is None:
@@ -95,7 +90,12 @@ class BBSTree():
         else:
             return None
 
-    def range_search():
+    def range_search(self, start, end, node=None):
+        pass
+        # if node is None:
+        #     node = self.root
+
+    def delete(self):
         pass
 
     # def rotateLeft(self, node: Node):
