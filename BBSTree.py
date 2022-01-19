@@ -82,11 +82,21 @@ class BBSTree():
     def delete(self):
         return 0
 
-    def search(self, startValues, endValues=None):
-        node = self.root
-        if node.isLeaf() and not (node is self.root):
+    def search(self, value, node=None):
+        if node is None:
+            node = self.root
+
+        if value == node.value and node.isLeaf():
             return node
-        # if startValues<node.value
+        elif value <= node.value and node.leftChild:
+            return self.search(value, node.leftChild)
+        elif node.rightChild:
+            return self.search(value, node.rightChild)
+        else:
+            return None
+
+    def range_search():
+        pass
 
     # def rotateLeft(self, node: Node):
     #     replaceNode = node.rightChild
@@ -115,7 +125,8 @@ class BBSTree():
                 self.printTree(child)
 
 if __name__ == "__main__":
-    datapoints = [6,7,8,9,10]
+    datapoints = [1,2,3,4,5,6,7,8,9,10]
     tree = BBSTree()
     tree.build(datapoints)
-    tree.printTree()
+    # tree.printTree()
+    tree.search(11).printNode()
