@@ -1,10 +1,5 @@
 import numpy as np
 
-#TO DO:
-#Build DONE
-#Search
-#Range Search
-
 class Node():
     def __init__(self, value, leftC = None, rightC = None):
         self.leftChild: Node = leftC
@@ -90,13 +85,83 @@ class BBSTree():
         else:
             return None
 
-    def range_search(self, start, end, node=None):
-        pass
-        # if node is None:
-        #     node = self.root
+    def left_search(self, start, node: Node):
+        subtrees_roots = []
+        if node.value >= start:
+            if node.isLeaf():
+                subtrees_roots.append(node)
+            else:
+                if node.rightChild:
+                    subtrees_roots.append(node.rightChild)
+                if node.leftChild:
+                    for subtree_root in self.left_search(start, node.leftChild):
+                        subtrees_roots.append(subtree_root)
+        else:
+            if node.rightChild:
+                for subtree_root in self.left_search(start, node.rightChild):
+                        subtrees_roots.append(subtree_root)
 
-    def delete(self):
-        pass
+        return subtrees_roots
+            
+    def right_search(self, end, node: Node):
+        subtrees_roots = []
+        if node.value <= end:
+            if node.isLeaf():
+                subtrees_roots.append(node)
+            else:
+                if node.rightChild:
+                    for subtree_root in self.right_search(end, node.rightChild):
+                        subtrees_roots.append(subtree_root)
+                if node.leftChild:
+                    subtrees_roots.append(node.leftChild)
+        else:
+            if node.leftChild:
+                for subtree_root in self.right_search(end, node.leftChild):
+                    subtrees_roots.append(subtree_root)
+
+        return subtrees_roots
+
+    def range_search(self, start, end, node=None):
+        if end < start:
+            temp = end
+            end = start
+            start = temp
+        if node is None:
+            node = self.root
+        results = []
+        if node.value < start and node.rightChild:
+            results = self.range_search(start, end, node.rightChild)
+        elif node.value > end and node.leftChild:
+            results = self.range_search(start, end, node.leftChild)
+        else:
+            # print('Split node:')
+            # node.printNode()
+            if node.leftChild:
+                left_subtrees_roots = self.left_search(start, node.leftChild)
+                results = left_subtrees_roots
+            if node.rightChild:
+                right_subtrees_roots = self.right_search(end, node.rightChild)
+                results = results + right_subtrees_roots
+
+        return results
+
+    def printLeafs(self, subroots):
+        for subroot in subroots:
+            if subroot.isLeaf():
+                subroot.printNode()
+            else:
+                if subroot.leftChild:
+                    self.printLeafs([subroot.leftChild])
+                if subroot.rightChild:
+                    self.printLeafs([subroot.rightChild])
+
+    def printTree(self, node: Node = None):
+        if node is None:
+            node = self.root
+        node.printNode()
+        for child in [node.leftChild, node.rightChild]:
+            if child:
+                self.printTree(child)
 
     # def rotateLeft(self, node: Node):
     #     replaceNode = node.rightChild
@@ -116,17 +181,14 @@ class BBSTree():
     #     node.leftChild = t
     #     return replaceNode
 
-    def printTree(self, node: Node = None):
-        if node is None:
-            node = self.root
-        node.printNode()
-        for child in [node.leftChild, node.rightChild]:
-            if child:
-                self.printTree(child)
-
 if __name__ == "__main__":
     datapoints = [1,2,3,4,5,6,7,8,9,10]
     tree = BBSTree()
     tree.build(datapoints)
     # tree.printTree()
-    tree.search(11).printNode()
+    print('=================================')
+    # tree.search(11).printNode()
+    mylist = tree.range_search(1, 2)
+    tree.printLeafs(mylist)
+    # for node in mylist:
+    #     node.printNode()
