@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
@@ -9,6 +8,18 @@ from nltk.corpus import stopwords
 # nltk.download('stopwords')
 # nltk.download('punkt')
 # nltk.download('wordnet')
+
+class Datapoint():
+    def __init__(self, vector, id = None):
+        self.vector = vector if isinstance(vector, list) else [vector]
+        self.id = id
+        
+    def toString(self) -> str:
+        string = str(self.id) + ' = [' + str(self.vector[0])
+        for a in self.vector[1:]:
+            string += ', ' + str(a)
+        string += ']'
+        return string
 
 def getListOfFiles(dir):
     # create a list of file and sub directories 
@@ -36,17 +47,20 @@ def custom_tokenizer(string):
     stop_words = set(stopwords.words('english'))
     return [stemmer.stem(word) for word in words if word.isalpha() and word not in stop_words]
 
-def vectorize(filenames):
+def vectorize(inputList, input='content', vocabulary=None):
     
-    countvectorizer = CountVectorizer(input='file', preprocessor=custom_preprocessor, tokenizer=custom_tokenizer, max_df=0.75, min_df=0.25)
-    count_wm = countvectorizer.fit_transform([open(filename, 'r', encoding='utf-8', errors='ignore') for filename in filenames])
+    countvectorizer = CountVectorizer(input=input, preprocessor=custom_preprocessor, tokenizer=custom_tokenizer, max_df=0.75, min_df=0.25, vocabulary=vocabulary)
+    count_wm = countvectorizer.fit_transform(inputList)
+    features = countvectorizer.get_feature_names_out()
+    if input=='file':
+        ids = [f.name for f in inputList]
+    else:
+        ids = list(range(0,len(inputList)))
+    datapoints = [Datapoint(list(pair[0]),pair[1]) for pair in zip(count_wm.toarray(), ids)]
 
-    count_tokens = countvectorizer.get_feature_names_out()
-
-    df_countvect = pd.DataFrame(data = count_wm.toarray(), index=filenames, columns = count_tokens)
-    return df_countvect.to_json(orient='index')
+    return datapoints, features
 
 if __name__ == "__main__":
-    directory = ".\\sample_documents"
-    fileNames = getListOfFiles(directory)
-    print(vectorize(fileNames))
+    fileNames = getListOfFiles(".\\sample_documents")
+    inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
+    results = vectorize(inputList)
