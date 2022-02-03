@@ -1,6 +1,9 @@
 import kdtree
 import quadtree
 import rangetree
+# import rtree
+import tools
 
-if __name__ == "__main__":
-    pass
+fileNames = tools.getListOfFiles(".\\sample_documents")
+inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
+datapoints = tools.vectorize(inputList, input='file')
