@@ -1,15 +1,4 @@
-
-class Datapoint():
-    def __init__(self, vector, id = None):
-        self.vector = vector if isinstance(vector, list) else [vector]
-        self.id = id
-        
-    def toString(self) -> str:
-        string = self.id + ' = [' + str(self.vector[0])
-        for a in self.vector[1:]:
-            string += ', ' + str(a)
-        string += ']'
-        return string
+from tools import Datapoint
 
 class Node():
     def __init__(self, datapoint: Datapoint, leftC = None, rightC = None, id = None, depth = 0):
