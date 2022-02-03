@@ -1,13 +1,14 @@
 import os
+import nltk
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-# import nltk
-# nltk.download('stopwords')
-# nltk.download('punkt')
-# nltk.download('wordnet')
+try:
+    nltk.data.find('tokenizers/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 class Datapoint():
     def __init__(self, vector, id = None):
@@ -48,7 +49,7 @@ def custom_tokenizer(string):
     return [stemmer.stem(word) for word in words if word.isalpha() and word not in stop_words]
 
 def vectorize(inputList, input='content', vocabulary=None):
-    
+
     countvectorizer = CountVectorizer(input=input, preprocessor=custom_preprocessor, tokenizer=custom_tokenizer, max_df=0.75, min_df=0.25, vocabulary=vocabulary)
     count_wm = countvectorizer.fit_transform(inputList)
     features = countvectorizer.get_feature_names_out()
@@ -63,4 +64,4 @@ def vectorize(inputList, input='content', vocabulary=None):
 if __name__ == "__main__":
     fileNames = getListOfFiles(".\\sample_documents")
     inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
-    results = vectorize(inputList)
+    results = vectorize(inputList, input='file')
