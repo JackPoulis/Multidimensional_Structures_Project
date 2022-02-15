@@ -9,6 +9,11 @@ class Node():
         self.id = id
 
     def isLeaf(self):
+        """Checks if the node is a leaf. A leaf node has no child nodes
+
+        :return: True if the node is leaf else False
+        :rtype: bool
+        """
         if self.leftChild or self.rightChild:
             return False
         else:
@@ -30,6 +35,15 @@ class Node():
         return string + tail
 
 def extractLeafs(node: Node):
+    """Takes a node of a tree/subtree and returns all the leaf nodes below that node
+
+    :param node: The root/subroot node of the tree/subtree to extract leafs
+    :type node: Node
+    :return: A list of all leaf nodes found below the node
+    including the node if it is a leaf node
+    :rtype: list
+    """
+
     leafs = []
     if node.isLeaf():
         leafs.append(node)
@@ -40,13 +54,35 @@ def extractLeafs(node: Node):
     return leafs
 
 class RangeTree():
-    def __init__(self, datapoints = None, axis=0):
+    """N-Dimensional range tree data structure
+
+    :param datapoints: The datapoints to generate the tree. 
+    If None creates an empty tree, defaults to None
+    :type datapoints: Datapoint, optional
+    :param axis: The dimension of the current tree. 
+    It is used internally for recursion, defaults to 0
+    :type axis: int, optional
+    """
+
+    def __init__(self, datapoints: Datapoint = None, axis = 0):
         self.axis = axis
         self.dimensions = len(datapoints[0].vector) if datapoints else 1
         self.terminalTree = True if self.axis == self.dimensions-1 else False
         self.root = self.build(datapoints)
 
-    def build(self, datapoints=None, node: Node = None):
+    def build(self, datapoints: Datapoint=None, node: Node = None):
+        """The build method of the range tree
+
+        :param datapoints: The datapoints if provided become 
+        the nodes of the tree, defaults to None
+        :type datapoints: Datapoint, optional
+        :param node: This parameter is used internally for
+        the recursion of this method, defaults to None
+        :type node: Node, optional
+        :return: Returns the root/subroot node of the new tree/subtree
+        :rtype: Node
+        """
+
         if datapoints == None or len(datapoints) == 0:
             return None
 
@@ -77,7 +113,23 @@ class RangeTree():
             
         return node
 
-    def split_search(self, start, end, node: Node, right_search=False):
+    def split_search(self, start, end, node: Node, right_search = False):
+        """Called internally by range_search() after the split node is found
+
+        :param start: The lower bound of the search
+        :type start: Any
+        :param end: The upper bound of the search
+        :type end: Any
+        :param node: The root/subroot of the tree to search
+        :type node: Node
+        :param right_search: Specifies if this search 
+        is right or left search, defaults to False
+        :type right_search: bool, optional
+        :return: all the trees/subtrees that have points
+        in the range of search
+        :rtype: list
+        """
+
         subroots = []
 
         right = node.rightChild
@@ -102,7 +154,20 @@ class RangeTree():
 
         return subroots
 
-    def findSplitNode(self, start, end, node: Node=None) -> Node:
+    def findSplitNode(self, start, end, node: Node = None) -> Node:
+        """Finds the node where the range search splits to left and right search
+
+        :param start: The lower bound of the search
+        :type start: Any
+        :param end: The upper bound of the search
+        :type end: Any
+        :param node: The root/subroot of the tree to search. If None provided
+        the search starts from the root of the tree, defaults to None
+        :type node: Node, optional
+        :return: Returns the split node of the range search
+        :rtype: Node
+        """
+
         if node is None:
             node = self.root
         
@@ -119,7 +184,20 @@ class RangeTree():
 
         return splitnode
 
-    def range_search(self, startVector: list, endVector: list, node=None):
+    def range_search(self, startVector: list, endVector: list, node: Node = None):
+        """Searches for the leaf nodes that are in the hyperrectangle [startVector, endVector]
+        If tree is 1D it searches for 1D points in the range [startVector, endVector]
+
+        :param startVector: The "corner" of the hyperrectangle
+        :type startVector: list
+        :param endVector: The hyperrectangle's antidiamentric "corner" of startVector
+        :type endVector: list
+        :param node: The root/subroot from where to start the search. If None provided
+        it starts from the tree's root, defaults to None
+        :type node: Node, optional
+        :return: Returns the resulting nodes of the range search
+        :rtype: list
+        """
 
         if self.root is None:
             return []
