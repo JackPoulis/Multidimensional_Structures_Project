@@ -14,7 +14,7 @@ class Node():
         else:
             return True
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         string = str(self.datapoint.id) + ": "
         tail = "Left: {leftvalue}, Right: {rightvalue}"
         leftstr = rightstr = "-"
@@ -54,7 +54,7 @@ class KDTree():
     def range_search(self, startVector: list, endVector: list, node=None):
         pass
 
-    def toString(self, node: Node = None) -> str:
+    def __str__(self, node: Node = None) -> str:
         string = ''
         if self.root == None:
             return string
@@ -62,11 +62,11 @@ class KDTree():
         if node is None:
             node = self.root
 
-        string = node.toString() + "\n"
+        string = str(node) + "\n"
 
         for child in [node.leftChild, node.rightChild]:
             if child:
-                string += self.toString(child)
+                string += self.__str__(child)
 
         return string
 
@@ -74,4 +74,4 @@ if __name__ == "__main__":
     dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
-    print(tree.toString())
+    print(tree)

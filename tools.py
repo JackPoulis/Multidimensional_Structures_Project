@@ -15,7 +15,7 @@ class Datapoint():
         self.vector = vector if isinstance(vector, list) else [vector]
         self.id = id
         
-    def toString(self) -> str:
+    def __str__(self) -> str:
         string = str(self.id) + ' = [' + str(self.vector[0])
         for a in self.vector[1:]:
             string += ', ' + str(a)
@@ -65,3 +65,5 @@ if __name__ == "__main__":
     fileNames = getListOfFiles(".\\sample_documents")
     inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
     results = vectorize(inputList, input='file')
+    dp = Datapoint([1,1], 0)
+    print(dp)

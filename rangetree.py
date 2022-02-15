@@ -14,7 +14,7 @@ class Node():
         else:
             return True
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         string = str(self.value) + ": "
         if self.isLeaf():
             tail = "id: " + (str(self.id) if self.id else "-")
@@ -160,20 +160,20 @@ class RangeTree():
                     results.append(node)
         return results
 
-    def toString(self, node: Node = None) -> str:
+    def __str__(self, node: Node = None) -> str:
         if self.root == None:
             return ''
 
         if node is None:
             node = self.root
-        string = " axis: " + str(self.axis) + " | " + node.toString() + "\n"
+        string = " axis: " + str(self.axis) + " | " + str(node) + "\n"
 
         for child in [node.leftChild, node.rightChild]:
             if child:
-                string += self.toString(child)
+                string += self.__str__(child)
         
         if node.subTree:
-            string += node.subTree.toString()
+            string += str(node.subTree)
 
         return string
 
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = RangeTree(datapoints)
-    # print(tree.toString())
-    results = tree.range_search([1,1,2],[6,5,1])
-    for node in results:
-        print(node.id[0],dictionary[node.id[0]])
+    print(str(tree))
+    # results = tree.range_search([1,1,2],[6,5,1])
+    # for node in results:
+    #     print(node.id[0],dictionary[node.id[0]])
