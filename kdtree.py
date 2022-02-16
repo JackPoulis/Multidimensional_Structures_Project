@@ -9,6 +9,11 @@ class Node():
         self.axis = depth%len(datapoint.vector)
 
     def isLeaf(self):
+        """Checks if the node is a leaf. A leaf node has no child nodes
+
+        :return: True if the node is leaf else False
+        :rtype: bool
+        """
         if self.leftChild or self.rightChild:
             return False
         else:
@@ -27,11 +32,28 @@ class Node():
         return string + tail
 
 class KDTree():
+    """N-Dimensional k-d tree data structure
+
+    :param datapoints: The datapoints to generate the tree. 
+    If None creates an empty tree, defaults to None
+    :type datapoints: Datapoint, optional
+    """
     def __init__(self, datapoints = None):
         self.dimensions = len(datapoints[0].vector) if datapoints else 1
         self.root = self.build(datapoints)
 
-    def build(self, datapoints, depth = 0):
+    def build(self, datapoints: Datapoint = None, depth = 0) -> Node:
+        """The build method of the k-d tree
+
+        :param datapoints: The datapoints if provided become 
+        the nodes of the tree, defaults to None
+        :type datapoints: Datapoint
+        :param depth: The depth of the tree at each node, 0 at root.
+        It is used internally for recursion, defaults to 0
+        :type depth: int, optional
+        :return: Returns the root/subroot node of the new tree/subtree
+        :rtype: Node
+        """
         if datapoints == None or len(datapoints) == 0:
             return None
 
