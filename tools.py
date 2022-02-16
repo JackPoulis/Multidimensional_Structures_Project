@@ -61,9 +61,43 @@ def vectorize(inputList, input='content', vocabulary=None):
 
     return datapoints, features
 
+def contained(range_a, range_b):
+    return intersection(range_a, range_b) == range_a
+
+def intersects(range_a, range_b):
+    intersects = True if not contained(range_a, range_b) or intersection(range_a, range_b) is None else False
+    return intersects
+
+def intersection(range_a, range_b):
+    dim = len(range_a[0])
+    point1 = [0] * dim
+    point2 = [0] * dim
+    for axis in range(len(range_a)):
+        a1 = range_a[0][axis]
+        a2 = range_a[1][axis]
+        min_a = min([a1, a2])
+        max_a = max([a1, a2])
+
+        b1 = range_b[0][axis]
+        b2 = range_b[1][axis]
+        min_b = min([b1, b2])
+        max_b = max([b1, b2])
+        
+        if (min_a > max_b) or (max_a < min_b):
+            return None
+
+        point1[axis] = max([min_a, min_b])
+        point2[axis] = min([max_a, max_b])
+
+    return (point1, point2)
+
 if __name__ == "__main__":
-    fileNames = getListOfFiles(".\\sample_documents")
-    inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
-    results = vectorize(inputList, input='file')
-    dp = Datapoint([1,1], 0)
-    print(dp)
+    # fileNames = getListOfFiles(".\\sample_documents")
+    # inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
+    # results = vectorize(inputList, input='file')
+    # dp = Datapoint([1,1], 0)
+    # print(dp)
+    range_a = ([2,2], [3,3])
+    range_b = ([1,1], [3,3])
+    con = contained(range_a, range_b)
+    print(con)
