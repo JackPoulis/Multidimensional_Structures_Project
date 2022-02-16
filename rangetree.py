@@ -70,7 +70,7 @@ class RangeTree():
         self.terminalTree = True if self.axis == self.dimensions-1 else False
         self.root = self.build(datapoints)
 
-    def build(self, datapoints: Datapoint=None, node: Node = None):
+    def build(self, datapoints: Datapoint=None, node: Node = None) -> Node:
         """The build method of the range tree
 
         :param datapoints: The datapoints if provided become 
