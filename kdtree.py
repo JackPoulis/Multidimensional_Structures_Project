@@ -19,6 +19,21 @@ class Node():
         else:
             return True  
 
+    def in_range(self, start_v, end_v):
+        if self.isLeaf():
+            for axis in range(len(self.datapoint.vector)):
+                l_bound = min([start_v[axis], end_v[axis]])
+                u_bound = max([start_v[axis], end_v[axis]])
+                if u_bound < self.datapoint.vector[axis] or l_bound > self.datapoint.vector[axis]:
+                    return False
+        else:
+            l_bound = min([start_v[self.axis], end_v[self.axis]])
+            u_bound = max([start_v[self.axis], end_v[self.axis]])
+            if u_bound < self.value or l_bound > self.value:
+                return False
+
+        return True
+
     def __str__(self) -> str:
         string = "Axis: {axis}, Value: {value} -> "
         tail = "Left: {leftvalue}, Right: {rightvalue}"
@@ -80,18 +95,21 @@ class KDTree():
             
         return node
 
-    # def range_search(self, startVector: list, endVector: list, node: Node = None):
+    # def range_search(self, startVector: list, endVector: list, node: Node = None, region = None):
     #     if self.root is None:
     #         return []
         
     #     if node is None:
     #         node = self.root
 
+    #     if region is None:
+    #         region = self.region
+
     #     s_range = (startVector, endVector)
     #     results = []
 
     #     if node.isLeaf():
-    #         if in_range(node, startVector, endVector):
+    #         if node.in_range(startVector, endVector):
     #             results.append(node)
     #     else:
     #         if contained(node.region(), s_range):
