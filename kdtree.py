@@ -1,13 +1,13 @@
-from tools import Datapoint
+from tools import *
 
 class Node():
-    def __init__(self, datapoint: Datapoint, leftC = None, rightC = None, id = None, depth = 0):
+    def __init__(self, value, axis, leftC = None, rightC = None, datapoint: Datapoint = None):
+        self.value = value
+        self.axis = axis
         self.leftChild: Node = leftC
         self.rightChild: Node = rightC
-        self.datapoint:Datapoint = datapoint
-        self.depth = depth
-        self.axis = depth%len(datapoint.vector)
-
+        self.datapoint: Datapoint = datapoint
+        
     def isLeaf(self):
         """Checks if the node is a leaf. A leaf node has no child nodes
 
@@ -17,19 +17,20 @@ class Node():
         if self.leftChild or self.rightChild:
             return False
         else:
-            return True
+            return True  
 
     def __str__(self) -> str:
-        string = str(self.datapoint.id) + ": "
+        string = "Axis: {axis}, Value: {value} -> "
         tail = "Left: {leftvalue}, Right: {rightvalue}"
         leftstr = rightstr = "-"
         if self.leftChild:
-            leftstr = str(self.leftChild.datapoint.id)
+            leftstr = str(self.leftChild.value)
         if self.rightChild:
-            rightstr = str(self.rightChild.datapoint.id)
+            rightstr = str(self.rightChild.value)
         tail = tail.format(leftvalue = leftstr, rightvalue = rightstr)
-        
-        return string + tail
+        if self.isLeaf():
+            tail = str(self.datapoint)
+        return string.format(axis = self.axis, value = self.value) + tail
 
 class KDTree():
     """N-Dimensional k-d tree data structure
@@ -43,38 +44,50 @@ class KDTree():
         self.root = self.build(datapoints)
 
     def build(self, datapoints: Datapoint = None, depth = 0) -> Node:
-        """The build method of the k-d tree
-
-        :param datapoints: The datapoints if provided become 
-        the nodes of the tree, defaults to None
-        :type datapoints: Datapoint
-        :param depth: The depth of the tree at each node, 0 at root.
-        It is used internally for recursion, defaults to 0
-        :type depth: int, optional
-        :return: Returns the root/subroot node of the new tree/subtree
-        :rtype: Node
-        """
+        # We assumed all datapoints have diferent positions 
         if datapoints == None or len(datapoints) == 0:
             return None
 
         axis = depth%self.dimensions
-        datapoints.sort(key=lambda x: x.vector[axis])
 
-        mid = (len(datapoints)-1)//2
-        nodepoint: Datapoint = datapoints[mid]
+        values = list(set([datapoint.vector[axis] for datapoint in datapoints]))
+        values = sorted(values)
+        
+        mid = (len(values)-1)//2
+        nodevalue = values[mid]
 
-        node = Node(nodepoint, depth = depth)
+        leftpoints = [datapoint for datapoint in datapoints if datapoint.vector[axis] <= nodevalue]
+        rightpoints = [datapoint for datapoint in datapoints if datapoint not in leftpoints]
 
-        leftpoints = [datapoint for datapoint in datapoints if datapoint.vector[axis] < node.datapoint.vector[axis]]
-        rightpoints = [datapoint for datapoint in datapoints if datapoint.vector[axis] > node.datapoint.vector[axis]]
-
-        node.leftChild = self.build(leftpoints, depth = depth + 1)
-        node.rightChild = self.build(rightpoints, depth = depth + 1)
+        node = Node(nodevalue, axis)
+        if len(datapoints) == 1:
+            node.datapoint=datapoints[0]
+        else:
+            node.leftChild = self.build(leftpoints, depth = depth + 1)
+            node.rightChild = self.build(rightpoints, depth = depth + 1)
             
         return node
 
-    def range_search(self, startVector: list, endVector: list, node=None):
-        pass
+    # def range_search(self, startVector: list, endVector: list, node: Node = None):
+    #     if self.root is None:
+    #         return []
+        
+    #     if node is None:
+    #         node = self.root
+
+    #     s_range = (startVector, endVector)
+    #     results = []
+    #     if node.isLeaf():
+    #         # if node.in_range(startVector, endVector):
+    #         #   results.append(node)
+    #     else:
+    #         if contained(node.region(), s_range):
+    #             [results.append(l) for l in extractLeafs(node)]
+    #         else:
+    #             if intersects(node.leftChild.region(), s_range):
+    #                 self.range_search(startVector, endVector, node.leftChild)
+    #             if intersects(node.rightChild.region(), s_range):
+    #                 self.range_search(startVector, endVector, node.rightChild)
 
     def __str__(self, node: Node = None) -> str:
         string = ''
@@ -93,7 +106,7 @@ class KDTree():
         return string
 
 if __name__ == "__main__":
-    dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
+    dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,7]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
     print(tree)
