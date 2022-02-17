@@ -33,6 +33,7 @@ class Datapoint():
         :return: True if datapoint is in the region else False
         :rtype: bool
         """
+
         for axis in range(len(region)):
             if self.vector[axis] < min(region[axis]) or self.vector[axis] > max(region[axis]):
                 return False
@@ -77,36 +78,24 @@ def vectorize(inputList, input='content', vocabulary=None):
 
     return datapoints, features
 
-def contained(range_a, range_b):
-    return intersection(range_a, range_b) == range_a
+def contained(region_a, region_b):
+    return intersection(region_a, region_b) == region_a
 
-def intersects(range_a, range_b):
-    inter_a_b = intersection(range_a, range_b)
-    intersects = True if not inter_a_b is None else False
-    return intersects
+def intersects(region_a, region_b):
+    inter_a_b = intersection(region_a, region_b)
+    return True if not inter_a_b is None else False
 
-def intersection(range_a, range_b):
-    dim = len(range_a[0])
-    point1 = [0] * dim
-    point2 = [0] * dim
-    for axis in range(len(range_a)):
-        a1 = range_a[0][axis]
-        a2 = range_a[1][axis]
-        min_a = min([a1, a2])
-        max_a = max([a1, a2])
-
-        b1 = range_b[0][axis]
-        b2 = range_b[1][axis]
-        min_b = min([b1, b2])
-        max_b = max([b1, b2])
-        
-        if (min_a > max_b) or (max_a < min_b): # >= <= in case we have exclusive range
+def intersection(region_a, region_b):
+    dim = len(region_a)
+    new_region = []
+    for axis in range(dim):
+        a = max([min(region_a[axis]),min(region_b[axis])])
+        b = min([max(region_a[axis]),max(region_b[axis])])
+        if b < a:
             return None
+        new_region.append([a,b])
 
-        point1[axis] = max([min_a, min_b])
-        point2[axis] = min([max_a, max_b])
-
-    return (point1, point2)
+    return new_region
 
 if __name__ == "__main__":
     # fileNames = getListOfFiles(".\\sample_documents")
