@@ -65,7 +65,8 @@ def contained(range_a, range_b):
     return intersection(range_a, range_b) == range_a
 
 def intersects(range_a, range_b):
-    intersects = True if not contained(range_a, range_b) or intersection(range_a, range_b) is None else False
+    inter_a_b = intersection(range_a, range_b)
+    intersects = True if not inter_a_b is None else False
     return intersects
 
 def intersection(range_a, range_b):
@@ -83,7 +84,7 @@ def intersection(range_a, range_b):
         min_b = min([b1, b2])
         max_b = max([b1, b2])
         
-        if (min_a > max_b) or (max_a < min_b):
+        if (min_a > max_b) or (max_a < min_b): # >= <= in case we have exclusive range
             return None
 
         point1[axis] = max([min_a, min_b])
@@ -99,5 +100,5 @@ if __name__ == "__main__":
     # print(dp)
     range_a = ([2,2], [3,3])
     range_b = ([1,1], [3,3])
-    con = contained(range_a, range_b)
-    print(con)
+    inter = intersects(range_a, range_b)
+    print(inter)
