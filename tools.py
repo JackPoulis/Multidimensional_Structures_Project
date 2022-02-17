@@ -22,6 +22,22 @@ class Datapoint():
         string += ']'
         return string
 
+    def in_range(self, region) -> bool:
+        """Check if the Datapoint is inside the given region.
+        The datapoint dimensions should be greater or equal to region dimensions
+
+        :param region: The region to check if the datapoint belongs to.
+        The region is a list with length = dimensions and for each dimension
+        it contains the min and max bounds. e.x. 3D region: [[x1,x2],[y1,y2],[z1,z2]]
+        :type region: list
+        :return: True if datapoint is in the region else False
+        :rtype: bool
+        """
+        for axis in range(len(region)):
+            if self.vector[axis] < min(region[axis]) or self.vector[axis] > max(region[axis]):
+                return False
+        return True
+
 def getListOfFiles(dir):
     # create a list of file and sub directories 
     # names in the given directory 
@@ -96,9 +112,4 @@ if __name__ == "__main__":
     # fileNames = getListOfFiles(".\\sample_documents")
     # inputList = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in fileNames]
     # results = vectorize(inputList, input='file')
-    # dp = Datapoint([1,1], 0)
-    # print(dp)
-    range_a = ([2,2], [3,3])
-    range_b = ([1,1], [3,3])
-    inter = intersects(range_a, range_b)
-    print(inter)
+    pass
