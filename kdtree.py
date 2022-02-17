@@ -96,7 +96,7 @@ class KDTree():
                 results.append(node)
         else:
             if contained(region, s_region):
-                [results.append(l) for l in KDTree.extractLeafs(node)]
+                [results.append(l) for l in extractLeafs(node)]
             else:
                 lc_region, rc_region = KDTree.bisect(region, node.axis, node.value)
                 if intersects(lc_region, s_region):
@@ -115,16 +115,6 @@ class KDTree():
         lefthalf[axis][1] = value
         righthalf[axis][0] = value
         return lefthalf, righthalf
-
-    def extractLeafs(node: Node):
-        leafs = []
-        if node.isLeaf():
-            leafs.append(node)
-        else:
-            for child in [node.leftChild, node.rightChild]:
-                if child:
-                    leafs = leafs + KDTree.extractLeafs(child)
-        return leafs
 
     def __str__(self, node: Node = None) -> str:
         string = ''

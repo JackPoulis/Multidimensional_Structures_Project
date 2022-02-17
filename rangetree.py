@@ -34,25 +34,6 @@ class Node():
         
         return string + tail
 
-def extractLeafs(node: Node):
-    """Takes a node of a tree/subtree and returns all the leaf nodes below that node
-
-    :param node: The root/subroot node of the tree/subtree to extract leafs
-    :type node: Node
-    :return: A list of all leaf nodes found below the node
-    including the node if it is a leaf node
-    :rtype: list
-    """
-
-    leafs = []
-    if node.isLeaf():
-        leafs.append(node)
-    else:
-        for child in [node.leftChild, node.rightChild]:
-            if child:
-                [leafs.append(leaf) for leaf in extractLeafs(child)]
-    return leafs
-
 class RangeTree():
     """N-Dimensional range tree data structure
 
@@ -70,7 +51,7 @@ class RangeTree():
         self.terminalTree = True if self.axis == self.dimensions-1 else False
         self.root = self.build(datapoints)
 
-    def build(self, datapoints: Datapoint=None, node: Node = None) -> Node:
+    def build(self, datapoints: Datapoint=None, node: Node = None) -> Node: # node param if unnecessary?
         """The build method of the range tree
 
         :param datapoints: The datapoints if provided become 

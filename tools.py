@@ -39,6 +39,25 @@ class Datapoint():
                 return False
         return True
 
+def extractLeafs(node):
+    """Takes a node of a tree/subtree and returns all the leaf nodes below that node
+
+    :param node: The root/subroot node of the tree/subtree to extract leafs
+    :type node: Node
+    :return: A list of all leaf nodes found below the node
+    including the node if it is a leaf node
+    :rtype: list
+    """
+
+    leafs = []
+    if node.isLeaf():
+        leafs.append(node)
+    else:
+        for child in [node.leftChild, node.rightChild]:
+            if child:
+                leafs = leafs + extractLeafs(child)
+    return leafs
+
 def getListOfFiles(dir):
     # create a list of file and sub directories 
     # names in the given directory 
