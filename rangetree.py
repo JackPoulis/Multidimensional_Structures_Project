@@ -1,38 +1,4 @@
-from tools import Datapoint
-
-class Node():
-    def __init__(self, value, leftC = None, rightC = None, id = None, subtree = None):
-        self.leftChild: Node = leftC
-        self.rightChild: Node = rightC
-        self.subTree: RangeTree = subtree
-        self.value = value
-        self.id = id
-
-    def isLeaf(self):
-        """Checks if the node is a leaf. A leaf node has no child nodes
-
-        :return: True if the node is leaf else False
-        :rtype: bool
-        """
-        if self.leftChild or self.rightChild:
-            return False
-        else:
-            return True
-
-    def __str__(self) -> str:
-        string = str(self.value) + ": "
-        if self.isLeaf():
-            tail = "id: " + (str(self.id) if self.id else "-")
-        else:
-            tail = "Left: {leftvalue}, Right: {rightvalue}"
-            leftstr = rightstr = "-"
-            if self.leftChild:
-                leftstr = str(self.leftChild.value)
-            if self.rightChild:
-                rightstr = str(self.rightChild.value)
-            tail = tail.format(leftvalue = leftstr, rightvalue = rightstr)
-        
-        return string + tail
+from tools import *
 
 class RangeTree():
     """N-Dimensional range tree data structure
@@ -52,6 +18,7 @@ class RangeTree():
         self.root = self.build(datapoints)
 
     def build(self, datapoints: Datapoint=None, node: Node = None) -> Node: # node param if unnecessary?
+        # We assumed all datapoints have diferent positions
         """The build method of the range tree
 
         :param datapoints: The datapoints if provided become 
@@ -76,17 +43,17 @@ class RangeTree():
         leftpoints = [datapoint for datapoint in datapoints if datapoint.vector[self.axis] <= nodevalue]
         rightpoints = [datapoint for datapoint in datapoints if datapoint not in leftpoints]
 
-        nodeid = None
+        nodepoint = None
         if self.terminalTree:
             nodesubtree = None
             if len(values) == 1:
-                nodeid = [datapoint.id for datapoint in datapoints]
+                nodepoint = datapoints[0]
                 nodevalue = datapoints[0].vector[self.axis]
         else:
             newaxis = self.axis+1
             nodesubtree = RangeTree(datapoints, axis=newaxis)
             
-        node = Node(value=nodevalue, subtree=nodesubtree, id=nodeid)
+        node = Node(value=nodevalue, axis = self.axis, subTree = nodesubtree, datapoint = nodepoint)
 
         if len(values) > 1:
             node.leftChild = self.build(leftpoints, node.leftChild)
@@ -225,7 +192,7 @@ class RangeTree():
 
         if node is None:
             node = self.root
-        string = " axis: " + str(self.axis) + " | " + str(node) + "\n"
+        string = str(node) + "\n"
 
         for child in [node.leftChild, node.rightChild]:
             if child:

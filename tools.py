@@ -39,6 +39,39 @@ class Datapoint():
                 return False
         return True
 
+class Node():
+    def __init__(self, value, axis, leftC = None, rightC = None, datapoint: Datapoint = None, subTree = None):
+        self.value = value
+        self.axis = axis
+        self.leftChild: Node = leftC
+        self.rightChild: Node = rightC
+        self.datapoint: Datapoint = datapoint
+        self.subTree = subTree
+        
+    def isLeaf(self):
+        """Checks if the node is a leaf. A leaf node has no child nodes
+
+        :return: True if the node is leaf else False
+        :rtype: bool
+        """
+        if self.leftChild or self.rightChild:
+            return False
+        else:
+            return True  
+
+    def __str__(self) -> str:
+        string = "Axis: {axis}, Value: {value} -> "
+        tail = "Left: {leftvalue}, Right: {rightvalue}"
+        leftstr = rightstr = "-"
+        if self.leftChild:
+            leftstr = str(self.leftChild.value)
+        if self.rightChild:
+            rightstr = str(self.rightChild.value)
+        tail = tail.format(leftvalue = leftstr, rightvalue = rightstr)
+        if self.isLeaf():
+            tail = str(self.datapoint)
+        return string.format(axis = self.axis, value = self.value) + tail
+
 def extractLeafs(node):
     """Takes a node of a tree/subtree and returns all the leaf nodes below that node
 
