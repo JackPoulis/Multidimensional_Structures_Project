@@ -41,7 +41,19 @@ class KDTree():
     """
     def __init__(self, datapoints = None):
         self.dimensions = len(datapoints[0].vector) if datapoints else 1
+        self.region = KDTree.calc_region(datapoints) if datapoints else None
         self.root = self.build(datapoints)
+
+    def calc_region(datapoints):
+        dim = len(datapoints[0].vector)
+        point1 = [0] * dim
+        point2 = [0] * dim
+        for axis in range(dim):
+            axis_vector = [datapoint.vector[axis] for datapoint in datapoints]
+            point1[axis] = min(axis_vector)
+            point2[axis] = max(axis_vector)
+
+        return (point1, point2)
 
     def build(self, datapoints: Datapoint = None, depth = 0) -> Node:
         # We assumed all datapoints have diferent positions 
@@ -77,9 +89,10 @@ class KDTree():
 
     #     s_range = (startVector, endVector)
     #     results = []
+
     #     if node.isLeaf():
-    #         # if node.in_range(startVector, endVector):
-    #         #   results.append(node)
+    #         if in_range(node, startVector, endVector):
+    #             results.append(node)
     #     else:
     #         if contained(node.region(), s_range):
     #             [results.append(l) for l in extractLeafs(node)]
@@ -109,4 +122,4 @@ if __name__ == "__main__":
     dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,7]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
-    print(tree)
+    print(tree.region)
