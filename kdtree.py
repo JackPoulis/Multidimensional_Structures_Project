@@ -19,21 +19,6 @@ class Node():
         else:
             return True  
 
-    def in_range(self, start_v, end_v):
-        if self.isLeaf():
-            for axis in range(len(self.datapoint.vector)):
-                l_bound = min([start_v[axis], end_v[axis]])
-                u_bound = max([start_v[axis], end_v[axis]])
-                if u_bound < self.datapoint.vector[axis] or l_bound > self.datapoint.vector[axis]:
-                    return False
-        else:
-            l_bound = min([start_v[self.axis], end_v[self.axis]])
-            u_bound = max([start_v[self.axis], end_v[self.axis]])
-            if u_bound < self.value or l_bound > self.value:
-                return False
-
-        return True
-
     def __str__(self) -> str:
         string = "Axis: {axis}, Value: {value} -> "
         tail = "Left: {leftvalue}, Right: {rightvalue}"
@@ -56,19 +41,18 @@ class KDTree():
     """
     def __init__(self, datapoints = None):
         self.dimensions = len(datapoints[0].vector) if datapoints else 1
-        self.region = KDTree.calc_region(datapoints) if datapoints else None
+        self.total_region = self.calc_region(datapoints) if datapoints else None
         self.root = self.build(datapoints)
 
-    def calc_region(datapoints):
-        dim = len(datapoints[0].vector)
-        point1 = [0] * dim
-        point2 = [0] * dim
-        for axis in range(dim):
+    def calc_region(self, datapoints):
+        region = []
+        for axis in range(self.dimensions):
             axis_vector = [datapoint.vector[axis] for datapoint in datapoints]
-            point1[axis] = min(axis_vector)
-            point2[axis] = max(axis_vector)
+            min_value = min(axis_vector)
+            max_value = max(axis_vector)
+            region.append([min_value, max_value])
 
-        return (point1, point2)
+        return region
 
     def build(self, datapoints: Datapoint = None, depth = 0) -> Node:
         # We assumed all datapoints have diferent positions 
@@ -95,30 +79,52 @@ class KDTree():
             
         return node
 
-    # def range_search(self, startVector: list, endVector: list, node: Node = None, region = None):
-    #     if self.root is None:
-    #         return []
+    def range_search(self, s_region: list, node: Node = None, region = None):
+        if self.root is None:
+            return []
         
-    #     if node is None:
-    #         node = self.root
+        if node is None:
+            node = self.root
 
-    #     if region is None:
-    #         region = self.region
+        if region is None:
+            region = self.total_region
+        
+        results = []
 
-    #     s_range = (startVector, endVector)
-    #     results = []
+        if node.isLeaf():
+            if node.datapoint.in_range(s_region):
+                results.append(node)
+        else:
+            if contained(region, s_region):
+                [results.append(l) for l in KDTree.extractLeafs(node)]
+            else:
+                lc_region, rc_region = KDTree.bisect(region, node.axis, node.value)
+                if intersects(lc_region, s_region):
+                    results = results + self.range_search(s_region, node.leftChild, lc_region)
+                if intersects(rc_region, s_region):
+                    results = results + self.range_search(s_region, node.rightChild, rc_region)
 
-    #     if node.isLeaf():
-    #         if node.in_range(startVector, endVector):
-    #             results.append(node)
-    #     else:
-    #         if contained(node.region(), s_range):
-    #             [results.append(l) for l in extractLeafs(node)]
-    #         else:
-    #             if intersects(node.leftChild.region(), s_range):
-    #                 self.range_search(startVector, endVector, node.leftChild)
-    #             if intersects(node.rightChild.region(), s_range):
-    #                 self.range_search(startVector, endVector, node.rightChild)
+        return results
+    
+    def bisect(region, axis, value):
+        region[axis].sort()
+        if value > region[axis][1] or value < region[axis][0]:
+            return None
+        lefthalf = [[v for v in ax] for ax in region]
+        righthalf = [[v for v in ax] for ax in region]
+        lefthalf[axis][1] = value
+        righthalf[axis][0] = value
+        return lefthalf, righthalf
+
+    def extractLeafs(node: Node):
+        leafs = []
+        if node.isLeaf():
+            leafs.append(node)
+        else:
+            for child in [node.leftChild, node.rightChild]:
+                if child:
+                    leafs = leafs + KDTree.extractLeafs(child)
+        return leafs
 
     def __str__(self, node: Node = None) -> str:
         string = ''
@@ -140,4 +146,5 @@ if __name__ == "__main__":
     dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,7]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
-    print(tree.region)
+    results = tree.range_search([[0,10],[0,10]])
+    # print([str(node) for node in results])
