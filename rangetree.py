@@ -59,7 +59,9 @@ class RangeTree():
         return node
 
     def search(self, point: list, node: Node = None) -> Datapoint:
-
+        if self.root is None:
+            return None
+    
         if node is None:
             node = self.root
 
