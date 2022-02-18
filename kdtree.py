@@ -9,10 +9,10 @@ class KDTree():
     """
     def __init__(self, datapoints = None):
         self.dimensions = len(datapoints[0].vector) if datapoints else 1
-        self.total_region = self.calc_region(datapoints) if datapoints else None
+        self.total_region = self.min_bound_box(datapoints) if datapoints else None
         self.root = self.build(datapoints)
 
-    def calc_region(self, datapoints):
+    def min_bound_box(self, datapoints):
         region = []
         for axis in range(self.dimensions):
             axis_vector = [datapoint.vector[axis] for datapoint in datapoints]
@@ -35,15 +35,15 @@ class KDTree():
         mid = (len(values)-1)//2
         nodevalue = values[mid]
 
-        leftpoints = [datapoint for datapoint in datapoints if datapoint.vector[axis] <= nodevalue]
-        rightpoints = [datapoint for datapoint in datapoints if datapoint not in leftpoints]
+        leftpoints = [dp for dp in datapoints if dp.vector[axis] <= nodevalue]
+        rightpoints = [dp for dp in datapoints if dp not in leftpoints]
 
         node = Node(nodevalue, axis)
         if len(datapoints) == 1:
             node.datapoint=datapoints[0]
         else:
-            node.leftChild = self.build(leftpoints, depth = depth + 1)
-            node.rightChild = self.build(rightpoints, depth = depth + 1)
+            node.left_child = self.build(leftpoints, depth = depth + 1)
+            node.right_child = self.build(rightpoints, depth = depth + 1)
             
         return node
 
@@ -59,18 +59,18 @@ class KDTree():
         
         results = []
 
-        if node.isLeaf():
+        if node.is_leaf():
             if node.datapoint.in_range(s_region):
                 results.append(node)
         else:
             if contained(region, s_region):
-                [results.append(l) for l in extractLeafs(node)]
+                [results.append(l) for l in extract_leafs(node)]
             else:
                 lc_region, rc_region = KDTree.bisect(region, node.axis, node.value)
                 if intersects(lc_region, s_region):
-                    results = results + self.range_search(s_region, node.leftChild, lc_region)
+                    results += self.range_search(s_region, node.left_child, lc_region)
                 if intersects(rc_region, s_region):
-                    results = results + self.range_search(s_region, node.rightChild, rc_region)
+                    results += self.range_search(s_region, node.right_child, rc_region)
 
         return results
     
@@ -94,7 +94,7 @@ class KDTree():
 
         string = str(node) + "\n"
 
-        for child in [node.leftChild, node.rightChild]:
+        for child in [node.left_child, node.right_child]:
             if child:
                 string += self.__str__(child)
 

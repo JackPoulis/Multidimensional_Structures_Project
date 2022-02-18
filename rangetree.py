@@ -17,16 +17,13 @@ class RangeTree():
         self.terminalTree = True if self.axis == self.dimensions-1 else False
         self.root = self.build(datapoints)
 
-    def build(self, datapoints: Datapoint=None, node: Node = None) -> Node: # node param if unnecessary?
-        # We assumed all datapoints have diferent positions
-        """The build method of the range tree
+    def build(self, datapoints: Datapoint=None) -> Node:
+        """The build method of the range tree.
+        This code assumes that all datapoints are different
 
         :param datapoints: The datapoints if provided become 
         the nodes of the tree, defaults to None
         :type datapoints: Datapoint, optional
-        :param node: This parameter is used internally for
-        the recursion of this method, defaults to None
-        :type node: Node, optional
         :return: Returns the root/subroot node of the new tree/subtree
         :rtype: Node
         """
@@ -34,14 +31,14 @@ class RangeTree():
         if datapoints == None or len(datapoints) == 0:
             return None
 
-        values = list(set([datapoint.vector[self.axis] for datapoint in datapoints]))
+        values = list(set([dp.vector[self.axis] for dp in datapoints]))
         values = sorted(values)
         
         mid = (len(values)-1)//2
         nodevalue = values[mid]
 
-        leftpoints = [datapoint for datapoint in datapoints if datapoint.vector[self.axis] <= nodevalue]
-        rightpoints = [datapoint for datapoint in datapoints if datapoint not in leftpoints]
+        leftpoints = [dp for dp in datapoints if dp.vector[self.axis] <= nodevalue]
+        rightpoints = [dp for dp in datapoints if dp not in leftpoints]
 
         nodepoint = None
         if self.terminalTree:
@@ -53,11 +50,11 @@ class RangeTree():
             newaxis = self.axis+1
             nodesubtree = RangeTree(datapoints, axis=newaxis)
             
-        node = Node(value=nodevalue, axis = self.axis, subTree = nodesubtree, datapoint = nodepoint)
+        node = Node(nodevalue, self.axis, subtree = nodesubtree, datapoint = nodepoint)
 
         if len(values) > 1:
-            node.leftChild = self.build(leftpoints, node.leftChild)
-            node.rightChild = self.build(rightpoints, node.rightChild)
+            node.left_child = self.build(leftpoints)
+            node.right_child = self.build(rightpoints)
             
         return node
 
@@ -80,29 +77,29 @@ class RangeTree():
 
         subroots = []
 
-        right = node.rightChild
-        left = node.leftChild
+        right = node.right_child
+        left = node.left_child
         if right_search==True:
-            right = node.leftChild
-            left = node.rightChild
+            right = node.left_child
+            left = node.right_child
 
         if right:
             if start <= node.value <= end:
                 subroots.append(right)
                 if left:
-                    [subroots.append(subroot) for subroot in self.split_search(start, end, left, right_search=right_search)]
+                    subroots += self.split_search(start, end, left, right_search)
             else:
-                [subroots.append(subroot) for subroot in self.split_search(start, end, right, right_search=right_search)]
+                subroots += self.split_search(start, end, right, right_search)
         else:
             if start <= node.value <= end:
                 if left:
-                    [subroots.append(subroot) for subroot in self.split_search(start, end, left, right_search=right_search)]
+                    subroots += self.split_search(start, end, left, right_search)
                 else:
                     subroots.append(node)
 
         return subroots
 
-    def findSplitNode(self, start, end, node: Node = None) -> Node:
+    def find_split_node(self, start, end, node: Node = None) -> Node:
         """Finds the node where the range search splits to left and right search
 
         :param start: The lower bound of the search
@@ -124,24 +121,27 @@ class RangeTree():
         if start <= node.value <= end:
             splitnode = node
         elif node.value < start:
-            if node.rightChild:
-                splitnode = self.findSplitNode(start, end, node.rightChild)
+            if node.right_child:
+                splitnode = self.find_split_node(start, end, node.right_child)
         else:
-            if node.leftChild:
-                splitnode = self.findSplitNode(start, end, node.leftChild)
+            if node.left_child:
+                splitnode = self.find_split_node(start, end, node.left_child)
 
         return splitnode
 
-    def range_search(self, startVector: list, endVector: list, node: Node = None):
-        """Searches for the leaf nodes that are in the hyperrectangle [startVector, endVector]
-        If tree is 1D it searches for 1D points in the range [startVector, endVector]
+    def range_search(self, vector_a: list, vector_b: list, node: Node = None):
+        """Searches for the leaf nodes that are 
+        in the hyperrectangle [vector_a, vector_b]
+        If tree is 1D it searches for 1D points 
+        in the range [vector_a, vector_b]
 
-        :param startVector: The "corner" of the hyperrectangle
-        :type startVector: list
-        :param endVector: The hyperrectangle's antidiamentric "corner" of startVector
-        :type endVector: list
-        :param node: The root/subroot from where to start the search. If None provided
-        it starts from the tree's root, defaults to None
+        :param vector_a: The "corner" of the hyperrectangle
+        :type vector_a: list
+        :param vector_b: The hyperrectangle's antidiamentric "corner" 
+        of vector_a
+        :type vector_b: list
+        :param node: The root/subroot from where to start the search.
+        If None provided it starts from the tree's root, defaults to None
         :type node: Node, optional
         :return: Returns the resulting nodes of the range search
         :rtype: list
@@ -153,36 +153,36 @@ class RangeTree():
         if node is None:
             node = self.root
 
-        start = startVector[self.axis] if isinstance(startVector, list) else startVector
-        end = endVector[self.axis] if isinstance(endVector, list) else endVector
+        start = vector_a[self.axis] if isinstance(vector_a, list) else vector_a
+        end = vector_b[self.axis] if isinstance(vector_b, list) else vector_b
 
         if end < start:
             temp = end
             end = start
             start = temp
  
-        splitnode = self.findSplitNode(start, end)
+        splitnode = self.find_split_node(start, end)
         if splitnode is None:
             return []
  
         subtrees = []
-        if splitnode.isLeaf():
+        if splitnode.is_leaf():
             subtrees = [splitnode]
         else:
-            if splitnode.leftChild:
-                left_subtrees_roots = self.split_search(start, end, splitnode.leftChild)
-                subtrees = left_subtrees_roots
-            if splitnode.rightChild:
-                right_subtrees_roots = self.split_search(start, end, splitnode.rightChild, right_search=True)
-                subtrees = subtrees + right_subtrees_roots
+            if splitnode.left_child:
+                l_roots = self.split_search(start, end, splitnode.left_child)
+                subtrees = l_roots
+            if splitnode.right_child:
+                r_roots = self.split_search(start, end, splitnode.right_child, right_search=True)
+                subtrees = subtrees + r_roots
 
         results = []
         if self.terminalTree:
             for tree in subtrees:
-                [results.append(node) for node in extractLeafs(tree)] 
+                [results.append(node) for node in extract_leafs(tree)] 
         else:
             for tree in subtrees:
-                for node in tree.subTree.range_search(startVector, endVector):
+                for node in tree.subtree.range_search(vector_a, vector_b):
                     results.append(node)
         return results
 
@@ -194,12 +194,12 @@ class RangeTree():
             node = self.root
         string = str(node) + "\n"
 
-        for child in [node.leftChild, node.rightChild]:
+        for child in [node.left_child, node.right_child]:
             if child:
                 string += self.__str__(child)
         
-        if node.subTree:
-            string += str(node.subTree)
+        if node.subtree:
+            string += str(node.subtree)
 
         return string
 
