@@ -129,17 +129,12 @@ class RangeTree():
 
         return splitnode
 
-    def range_search(self, vector_a: list, vector_b: list, node: Node = None):
+    def range_search(self, s_region: list, node: Node = None):
         """Searches for the leaf nodes that are 
-        in the hyperrectangle [vector_a, vector_b]
-        If tree is 1D it searches for 1D points 
-        in the range [vector_a, vector_b]
+        in the hyperrectangle s_region
 
-        :param vector_a: The "corner" of the hyperrectangle
-        :type vector_a: list
-        :param vector_b: The hyperrectangle's antidiamentric "corner" 
-        of vector_a
-        :type vector_b: list
+        :param s_region: The region to search for the datapoints
+        :type s_region: list
         :param node: The root/subroot from where to start the search.
         If None provided it starts from the tree's root, defaults to None
         :type node: Node, optional
@@ -153,8 +148,8 @@ class RangeTree():
         if node is None:
             node = self.root
 
-        start = vector_a[self.axis] if isinstance(vector_a, list) else vector_a
-        end = vector_b[self.axis] if isinstance(vector_b, list) else vector_b
+        start = s_region[self.axis][0]
+        end = s_region[self.axis][1]
 
         if end < start:
             temp = end
@@ -182,7 +177,7 @@ class RangeTree():
                 [results.append(node) for node in extract_leafs(tree)] 
         else:
             for tree in subtrees:
-                for node in tree.subtree.range_search(vector_a, vector_b):
+                for node in tree.subtree.range_search(s_region):
                     results.append(node)
         return results
 
@@ -208,6 +203,6 @@ if __name__ == "__main__":
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = RangeTree(datapoints)
     print(str(tree))
-    # results = tree.range_search([1,1,2],[6,5,1])
-    # for node in results:
-    #     print(node.id[0],dictionary[node.id[0]])
+    results = tree.range_search([[1,5],[1,5]])
+    for node in results:
+        print(node.datapoint)
