@@ -47,6 +47,28 @@ class KDTree():
             
         return node
 
+    def search(self, point, node: Node = None):
+        if self.root is None:
+            return None
+
+        if node is None:
+            node = self.root
+
+        value = point[node.axis]
+
+        result = None
+        if value <= node.value:
+            if node.left_child:
+                result = self.search(point, node.left_child)
+            elif node.is_leaf():
+                if node.datapoint.vector == point:
+                    result = node
+        else:
+            if node.right_child:
+                result = self.search(point, node.right_child)
+
+        return result
+
     def range_search(self, s_region: list, node: Node = None, region = None):
         if self.root is None:
             return []
@@ -95,7 +117,7 @@ class KDTree():
         string = str(node) + "\n"
 
         for child in [node.left_child, node.right_child]:
-            if child and not child.is_leaf():
+            if child:
                 string += self.__str__(child)
 
         return string
@@ -104,7 +126,8 @@ if __name__ == "__main__":
     dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,7]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
-    print(tree)
+    # print(tree)
     # results = tree.range_search([[0,10],[0,10]])
     # for node in results:
     #     print(node)
+    print(tree.search([9,1]))
