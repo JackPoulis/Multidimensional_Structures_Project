@@ -58,20 +58,28 @@ class RangeTree():
             
         return node
 
-    # def search(self, point: list, node: Node = None):
-    #     if node is None:
-    #         node = self.root
+    def search(self, point: list, node: Node = None) -> Datapoint:
 
-    #     if node.is_leaf():
-    #         if node.datapoint.vector == point:
-    #             return node.datapoint
-    #         else:
-    #             return None
-    #     else:
-    #         if node.value <= point[self.axis]:
+        if node is None:
+            node = self.root
 
-    #         else:
+        value = point[self.axis]
 
+        result = None
+
+        if value <= node.value:
+            if node.left_child:
+                result = self.search(point, node.left_child)
+            elif node.is_leaf():
+                if node.subtree:
+                    result = node.subtree.search(point)
+                elif node.datapoint.vector == point:
+                    result = node
+        elif value > node.value:
+            if node.right_child:
+                result = self.search(point, node.right_child)
+
+        return result
 
     def split_search(self, start, end, node: Node, right_search = False):
         """Called internally by range_search() after the split node is found
@@ -204,7 +212,7 @@ class RangeTree():
         string = str(node) + "\n"
 
         for child in [node.left_child, node.right_child]:
-            if child and not child.is_leaf():
+            if child:
                 string += self.__str__(child)
         
         if node.subtree:
@@ -217,6 +225,8 @@ if __name__ == "__main__":
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = RangeTree(datapoints)
     print(str(tree))
-    results = tree.range_search([[1,5],[1,5]])
-    for node in results:
-        print(node.datapoint)
+    # results = tree.range_search([[1,5],[1,5]])
+    # for node in results:
+    #     print(node.datapoint)
+    #     print(node.axis)
+    # print(tree.search([2,4]))

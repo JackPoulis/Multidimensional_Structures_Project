@@ -88,8 +88,9 @@ class Node():
             output = head_str.format(axis = axis, value = value)
             output += childs_str.format(lvalue = lvalue, rvalue = rvalue)
 
-            if self.subtree:
-                output += ", subtree: " + str(self.subtree.root)
+        if self.subtree:
+            output += ", subtree: " + str(self.subtree.root)
+            
         return output
 
 def extract_leafs(node: Node):
