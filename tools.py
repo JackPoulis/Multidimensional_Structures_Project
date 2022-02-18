@@ -5,10 +5,10 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-try:
-    nltk.data.find('tokenizers/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+# try:
+#     nltk.data.find('tokenizers/stopwords')
+# except LookupError:
+#     nltk.download('stopwords')
 
 class Datapoint():
     def __init__(self, vector, id = None):
@@ -112,6 +112,17 @@ def extract_leafs(node: Node):
             if child:
                 leafs = leafs + extract_leafs(child)
     return leafs
+
+def calc_mbr(datapoints):
+    dim = len(datapoints[0].vector)
+    region = []
+    for axis in range(dim):
+        axis_vector = [datapoint.vector[axis] for datapoint in datapoints]
+        min_value = min(axis_vector)
+        max_value = max(axis_vector)
+        region.append([min_value, max_value])
+
+    return region
 
 def list_files(dir):
     # create a list of file and sub directories 

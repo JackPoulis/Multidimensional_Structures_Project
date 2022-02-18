@@ -9,18 +9,8 @@ class KDTree():
     """
     def __init__(self, datapoints = None):
         self.dimensions = len(datapoints[0].vector) if datapoints else 1
-        self.total_region = self.min_bound_box(datapoints) if datapoints else None
+        self.total_region = calc_mbr(datapoints) if datapoints else None
         self.root = self.build(datapoints)
-
-    def min_bound_box(self, datapoints):
-        region = []
-        for axis in range(self.dimensions):
-            axis_vector = [datapoint.vector[axis] for datapoint in datapoints]
-            min_value = min(axis_vector)
-            max_value = max(axis_vector)
-            region.append([min_value, max_value])
-
-        return region
 
     def build(self, datapoints: Datapoint = None, depth = 0) -> Node:
         # We assumed all datapoints have diferent positions 
