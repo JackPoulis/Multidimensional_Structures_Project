@@ -113,7 +113,16 @@ def extract_leafs(node: Node):
                 leafs = leafs + extract_leafs(child)
     return leafs
 
-def calc_mbr(datapoints):
+def calc_mbr(datapoints: Datapoint):
+    """Calculate the minimum bounding rectangle that contains the datapoints
+
+    :param datapoints: The input datapoints to calculate the MBR
+    :type datapoints: Datapoint
+    :return: The MBR in the form [[x1,x2],[y1,y2],[z1,z2],...] where every element
+    in the list is the bounds of the corresponding dimension
+    :rtype: list
+    """
+
     dim = len(datapoints[0].vector)
     region = []
     for axis in range(dim):
