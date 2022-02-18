@@ -41,11 +41,11 @@ class RangeTree():
         rightpoints = [dp for dp in datapoints if dp not in leftpoints]
 
         nodepoint = None
+        if len(values) == 1:
+            nodepoint = datapoints[0]
+
         if self.terminalTree:
             nodesubtree = None
-            if len(values) == 1:
-                nodepoint = datapoints[0]
-                nodevalue = datapoints[0].vector[self.axis]
         else:
             newaxis = self.axis+1
             nodesubtree = RangeTree(datapoints, axis=newaxis)
@@ -57,6 +57,21 @@ class RangeTree():
             node.right_child = self.build(rightpoints)
             
         return node
+
+    # def search(self, point: list, node: Node = None):
+    #     if node is None:
+    #         node = self.root
+
+    #     if node.is_leaf():
+    #         if node.datapoint.vector == point:
+    #             return node.datapoint
+    #         else:
+    #             return None
+    #     else:
+    #         if node.value <= point[self.axis]:
+
+    #         else:
+
 
     def split_search(self, start, end, node: Node, right_search = False):
         """Called internally by range_search() after the split node is found
@@ -174,11 +189,10 @@ class RangeTree():
         results = []
         if self.terminalTree:
             for tree in subtrees:
-                [results.append(node) for node in extract_leafs(tree)] 
+                results += extract_leafs(tree) 
         else:
             for tree in subtrees:
-                for node in tree.subtree.range_search(s_region):
-                    results.append(node)
+                results += tree.subtree.range_search(s_region)
         return results
 
     def __str__(self, node: Node = None) -> str:
@@ -190,7 +204,7 @@ class RangeTree():
         string = str(node) + "\n"
 
         for child in [node.left_child, node.right_child]:
-            if child:
+            if child and not child.is_leaf():
                 string += self.__str__(child)
         
         if node.subtree:

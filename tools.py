@@ -61,17 +61,36 @@ class Node():
             return True  
 
     def __str__(self) -> str:
-        string = "Axis: {axis}, Value: {value} -> "
-        tail = "Left: {leftvalue}, Right: {rightvalue}"
-        leftstr = rightstr = "-"
-        if self.left_child:
-            leftstr = str(self.left_child.value)
-        if self.right_child:
-            rightstr = str(self.right_child.value)
-        tail = tail.format(leftvalue = leftstr, rightvalue = rightstr)
+        head_str = "axis {axis}: ({value}) -> "
+        childs_str = "left: ({lvalue}), right: ({rvalue})"
+        lvalue = rvalue = '-'
+        axis = self.axis
+
         if self.is_leaf():
-            tail = str(self.datapoint)
-        return string.format(axis = self.axis, value = self.value) + tail
+            if self.datapoint:
+                output = str(self.datapoint)
+            else:
+                output = str(self.value)
+        else:
+            value = self.value
+            if self.left_child:
+                if self.left_child.is_leaf():
+                    lvalue = str(self.left_child.datapoint)
+                else:
+                    lvalue = str(self.left_child.value)
+
+            if self.right_child:
+                if self.right_child.is_leaf():
+                    rvalue = str(self.right_child.datapoint)
+                else:
+                    rvalue = str(self.right_child.value)
+            
+            output = head_str.format(axis = axis, value = value)
+            output += childs_str.format(lvalue = lvalue, rvalue = rvalue)
+
+            if self.subtree:
+                output += ", subtree: " + str(self.subtree.root)
+        return output
 
 def extract_leafs(node: Node):
     """Takes a node of a tree/subtree and returns 
