@@ -118,8 +118,8 @@ def calc_mbr(datapoints: Datapoint):
 
     :param datapoints: The input datapoints to calculate the MBR
     :type datapoints: Datapoint
-    :return: The MBR in the form [[x1,x2],[y1,y2],[z1,z2],...] where every element
-    in the list is the bounds of the corresponding dimension
+    :return: The MBR in the form [[x1,x2],[y1,y2],[z1,z2],...] where every list
+    in the total list is the bounds of the corresponding dimension
     :rtype: list
     """
 
@@ -159,14 +159,14 @@ def custom_tokenizer(string):
     stop_words = set(stopwords.words('english'))
     return [stemmer.stem(word) for word in words if word.isalpha() and word not in stop_words]
 
-def vectorize(input_list, input='content', vocabulary=None):
+def vectorize(input_list, input='content', vocabulary=None, min_df = 0.0, max_df = 1.0):
 
     countvectorizer = CountVectorizer(
         input = input, 
         preprocessor = custom_preprocessor, 
         tokenizer = custom_tokenizer, 
-        max_df = 0.75,
-        min_df = 0.25, 
+        max_df = max_df,
+        min_df = min_df, 
         vocabulary = vocabulary)
 
     count_wm = countvectorizer.fit_transform(input_list)
