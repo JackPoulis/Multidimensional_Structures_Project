@@ -150,6 +150,12 @@ def list_files(dir):
                 
     return file_names
 
+def preprocess_string(string: str):
+    string = string.lower()
+    words = custom_tokenizer(string)
+    string = ' '.join(word for word in words)
+    return string
+
 def custom_preprocessor(string: str):
     return string.lower()
 
