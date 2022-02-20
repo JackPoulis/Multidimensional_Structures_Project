@@ -20,20 +20,22 @@ def one_hot(shingle, vocab):
     return one_hot_array
 
 def sign_value(one_hot, permutation):
-    one_hot_arrray = np.array(one_hot)
-    indexes = np.nonzero(one_hot_arrray)[0]
-    value = min(np.array(permutation)[indexes])
+    indexes = np.nonzero(one_hot)[0]
+    value = min(permutation[indexes])
     return value
 
-def min_hash(one_hot: list, k: int, seed: list):
-    rand = random.Random(seed)
-    perm_seeds = [rand.randint(0,1e20) for _ in range(k)]
-    linspace = list(range(1,len(one_hot)+1))
+def gen_permutations(length, k):
+    linspace = np.arange(1, length+1, 1)
+    permutations = []
+    for _ in range(k):
+        random.shuffle(linspace)
+        permutations.append(np.array(linspace))
+    return np.array(permutations)
+
+def min_hash(one_hot, permutations):
     signature = []
-    for i in range(k):
-        permutation = linspace.copy()
-        random.Random(perm_seeds[i]).shuffle(permutation)
-        signature.append(sign_value(one_hot, permutation))
+    for i in range(len(permutations)):
+        signature.append(sign_value(one_hot, permutations[i]))
     return signature
 
 def split_signature(sign, b):
@@ -50,13 +52,13 @@ def calc_candidate_pairs(names, sign_matrix):
             id = str(names[i]) + '-' + str(names[j])
             for a,b in zip(sign_matrix[i], sign_matrix[j]):
                 comp = (a == b)
-                if comp.any():
+                if comp.all():
                     candidate = True
                     break
             cand_pairs.append([id, candidate])
     return cand_pairs
 
-def LSH(documents, ids=None, k=3, h=20 , b=2, seed=1):
+def LSH(documents, ids=None, k=3, sign_length=20 , b=2):
     if ids is None:
         ids = list(range(0,len(documents)))
 
@@ -65,15 +67,18 @@ def LSH(documents, ids=None, k=3, h=20 , b=2, seed=1):
         shingles.append(shingle(doc, k))
 
     vocab = gen_vocab(shingles)
+    length = len(vocab)
 
     one_hot_arrays = []
     for sh in shingles:
         one_hot_arrays.append(one_hot(sh, vocab))
+    one_hot_arrays = np.array(one_hot_arrays)
 
     signatures = []
-    for oh in one_hot_arrays:
-        signatures.append(min_hash(oh, h, seed))
-
+    permutations = gen_permutations(length, sign_length)
+    for i, oh in enumerate(one_hot_arrays):
+        signatures.append(min_hash(oh, permutations))
+        
     sign_matrix = []
     for sign in signatures:
         sign_matrix.append(split_signature(sign, b))
@@ -94,29 +99,48 @@ def cosine_sim_pairs(names, vectors):
 
     return similarities
         
+def jaccard_binary(x,y):
+    intersection = np.logical_and(x, y)
+    union = np.logical_or(x, y)
+    similarity = intersection.sum() / float(union.sum())
+    return similarity
+
+def jaccard_sim_pairs(names, vectors):
+    similarities = []
+    for i in range(len(names)):
+        for j in range(i):
+            id = str(names[i]) + '-' + str(names[j])
+            sim = jaccard_binary(vectors[i], vectors[j])
+            similarities.append([id, sim])
+
+    return similarities
 
 if __name__ == "__main__":
-    file_names = list_files(".\\sample_documents")
+    # file_names = list_files(".\\sample_documents")
+    file_names = list_files(".\\sample_documents\\samples2")
     files_list = [
         open(filename, 'r', encoding='utf-8', errors='ignore') 
         for filename in file_names]
     content_list  = [f.read() for f in files_list]
     names = [f.name for f in files_list]
-
-    lsh_results = LSH(content_list, names, k=5, h=40 , b=2, seed=1)
-    # for r in lsh_results:
-    #     print(r)
+    content_list = [preprocess_string(cont) for cont in content_list]
 
     datapoints, _ = vectorize(content_list)
     vectors = [dp.vector for dp in datapoints]
     cos_results = cosine_sim_pairs(names, vectors)
-    # for r in cos_results:
-    #     print(r)
+    vectors_bin = np.where(np.array(vectors) > 0, 1, 0)
+    jac_results = jaccard_sim_pairs(names, vectors_bin)
+    lsh_results = LSH(content_list, names, k=2, sign_length=40 , b=4)
+    # for c,l in zip(cos_results, lsh_results):
+    #     print(c,l)
 
-    x_axis = [x[1] for x in cos_results]
-    y_axis = [1 if x[1]==True else 0 for x in lsh_results]
+    a_axis = [x[1] for x in cos_results]
+    b_axis = [x[1] for x in jac_results]
+    c_axis = [1 if x[1]==True else 0 for x in lsh_results]
     
-    plt.scatter(x_axis, y_axis)
-    plt.ylabel('candidate')
-    plt.xlabel('cosine similarity')
+    plt.scatter(a_axis, c_axis, s=5)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.xlim(-0.1,1.1)
+    plt.ylim(-0.1,1.1)
     plt.show()

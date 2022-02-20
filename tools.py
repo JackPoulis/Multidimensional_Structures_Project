@@ -165,7 +165,7 @@ def custom_tokenizer(string):
     stop_words = set(stopwords.words('english'))
     return [stemmer.stem(word) for word in words if word.isalpha() and word not in stop_words]
 
-def vectorize(input_list, input='content', vocabulary=None, min_df = 0.0, max_df = 1.0):
+def vectorize(input_list, input='content', vocabulary=None, min_df = 0.3, max_df = 0.7):
 
     countvectorizer = CountVectorizer(
         input = input, 
