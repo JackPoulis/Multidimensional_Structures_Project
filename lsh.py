@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 def shingle(text, k):
     shingle_set = []
+    if k < 1:
+        raise ValueError('k cannot be less than 1')
     for i in range(len(text) - k + 1):
         shingle_set.append(text[i:i+k])
     return set(shingle_set)
@@ -14,8 +16,7 @@ def gen_vocab(shingles: list):
     vocab = set().union(*shingles)
     return vocab
 
-def one_hot(shingle, vocab):
-    # one_hot_array = np.where(np.isin(vocab, shingle), 1, 0)
+def one_hot(shingle: set, vocab: list):
     one_hot_array = [1 if x in shingle else 0 for x in vocab]
     return one_hot_array
 
@@ -40,6 +41,8 @@ def min_hash(one_hot, permutations):
 
 def split_signature(sign, b):
     #len(sign)%b should be 0
+    if len(sign)%b != 0:
+        raise ValueError('b should divide signature\'s length to an integer')
     matrix = np.array(sign)
     matrix = matrix.reshape(b, len(sign)//b)
     return matrix
@@ -66,7 +69,7 @@ def LSH(documents, ids=None, k=3, sign_length=20 , b=2):
     for doc in documents:
         shingles.append(shingle(doc, k))
 
-    vocab = gen_vocab(shingles)
+    vocab = list(gen_vocab(shingles))
     length = len(vocab)
 
     one_hot_arrays = []
@@ -76,7 +79,7 @@ def LSH(documents, ids=None, k=3, sign_length=20 , b=2):
 
     signatures = []
     permutations = gen_permutations(length, sign_length)
-    for i, oh in enumerate(one_hot_arrays):
+    for oh in one_hot_arrays:
         signatures.append(min_hash(oh, permutations))
         
     sign_matrix = []
@@ -115,6 +118,9 @@ def jaccard_sim_pairs(names, vectors):
 
     return similarities
 
+def p(x, r, b):
+    return (1 - np.power((1 - np.power(x,r)),b))
+
 if __name__ == "__main__":
     # file_names = list_files(".\\sample_documents")
     file_names = list_files(".\\sample_documents\\samples2")
@@ -123,24 +129,30 @@ if __name__ == "__main__":
         for filename in file_names]
     content_list  = [f.read() for f in files_list]
     names = [f.name for f in files_list]
-    content_list = [preprocess_string(cont) for cont in content_list]
+    # content_list = [preprocess_string(cont) for cont in content_list]
+
+    k = 2 #shingles size
+    s = 49 #singature length
+    b = 7 #number of signature bands
 
     datapoints, _ = vectorize(content_list)
     vectors = [dp.vector for dp in datapoints]
     cos_results = cosine_sim_pairs(names, vectors)
     vectors_bin = np.where(np.array(vectors) > 0, 1, 0)
     jac_results = jaccard_sim_pairs(names, vectors_bin)
-    lsh_results = LSH(content_list, names, k=2, sign_length=40 , b=4)
-    # for c,l in zip(cos_results, lsh_results):
-    #     print(c,l)
-
+    lsh_results = LSH(content_list, names, k=k, sign_length=s , b=b)
+    for c,l in zip(cos_results, lsh_results):
+        print(c,l)
+    linspace = np.linspace(0,1,100)
     a_axis = [x[1] for x in cos_results]
     b_axis = [x[1] for x in jac_results]
     c_axis = [1 if x[1]==True else 0 for x in lsh_results]
-    
-    plt.scatter(a_axis, c_axis, s=5)
-    plt.xlabel('x')
-    plt.ylabel('y')
+    p_line = [p(x, s/b, b) for x in linspace]
+    plt.scatter(a_axis, c_axis, s=8)
+    plt.plot(linspace, p_line, color="red")
+    plt.title("LSH candidate pairs")
+    plt.xlabel('Cosine similarity')
+    plt.ylabel('LSH candidate pairs')
     plt.xlim(-0.1,1.1)
     plt.ylim(-0.1,1.1)
     plt.show()
