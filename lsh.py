@@ -4,7 +4,19 @@ import random
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 
-def shingle(text, k):
+def shingle(text: str, k: int):
+    """Generates a list of strings length k 
+    with all the unique length k substrings that text contains 
+    for example: text="Hey Hello", k=2 returns {"He","ey","y "," H","el","ll","lo"}
+
+    :param text: A string of characters
+    :type text: str
+    :param k: The length of its 
+    :type k: int
+    :raises ValueError: k cannot be less than 1
+    :return: A set of all unique length k substrings contained in text
+    :rtype: set
+    """    
     shingle_set = []
     if k < 1:
         raise ValueError('k cannot be less than 1')
@@ -13,10 +25,34 @@ def shingle(text, k):
     return set(shingle_set)
 
 def gen_vocab(shingles: list):
+    """Generates a vocabulary from a list of shigles(sets)
+
+    :param shingles: List of shigles(sets) e.x. [{...},{...},...]
+    :type shingles: list
+    :return: A vocabulary with unique values
+    :rtype: set
+    """    
     vocab = set().union(*shingles)
     return vocab
 
 def one_hot(shingle: set, vocab: list):
+    """Generates the one hot encoding array 
+    given a shingle(set) and a vocabulary. The result has
+    the same length as the vocab list and has 1 at indexes
+    which the elements of vocab match an element of shingle
+    and zeros everywhere else
+    For example: 
+    one_hot({"b"}, ["a", "b", "c", "d"]) -> [0,1,0,0]
+
+    :param shingle: A set of shingles
+    :type shingle: set
+    :param vocab: A vocabulary of shingles
+    :type vocab: list
+    :return: A list that has 1 at indexes
+    which the elements of vocab match an element of shingle
+    and zeros everywhere else
+    :rtype: list
+    """    
     one_hot_array = [1 if x in shingle else 0 for x in vocab]
     return one_hot_array
 
@@ -123,7 +159,7 @@ def p(x, r, b):
 
 if __name__ == "__main__":
     # file_names = list_files(".\\sample_documents")
-    file_names = list_files(".\\sample_documents\\samples2")
+    file_names = list_files(".\\samples\\samples2")
     files_list = [
         open(filename, 'r', encoding='utf-8', errors='ignore') 
         for filename in file_names]
