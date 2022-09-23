@@ -137,12 +137,6 @@ def cosine_sim_pairs(names, vectors):
             similarities.append([id, sim])
 
     return similarities
-        
-def jaccard_binary(x,y):
-    intersection = np.logical_and(x, y)
-    union = np.logical_or(x, y)
-    similarity = intersection.sum() / float(union.sum())
-    return similarity
 
 def jaccard_sim_pairs(names, vectors):
     similarities = []
@@ -153,6 +147,33 @@ def jaccard_sim_pairs(names, vectors):
             similarities.append([id, sim])
 
     return similarities
+
+def jaccard_sim(x: str, y: str):
+    """Calculates the Jaccard similarity of 2 strings. 
+    The Jaccard similarity of 2 strings is calculated by the
+    formula #intersection(X,Y)/#union(X,Y)
+
+    :param x: The first input string
+    :type x: str
+    :param y: The second input string
+    :type y: str
+    :return: The Jaccard similarity. It ranges from 0 to 1
+    :rtype: float
+    """    
+
+    x_set = set(x.split())
+    y_set = set(y.split())
+    intersection = x_set.intersection(y_set)
+    union = x_set.union(y_set)
+    return len(intersection)/len(union)
+
+def jaccard_binary(x,y):
+    intersection = np.logical_and(x, y)
+    union = np.logical_or(x, y)
+    similarity = intersection.sum() / float(union.sum())
+    return similarity
+
+
 
 def p(x, r, b):
     return (1 - np.power((1 - np.power(x,r)),b))
@@ -167,9 +188,9 @@ if __name__ == "__main__":
     names = [f.name for f in files_list]
     # content_list = [preprocess_string(cont) for cont in content_list]
 
-    k = 2 #shingles size
-    s = 49 #singature length
-    b = 7 #number of signature bands
+    k = 4 #shingles size
+    s = 100 #singature length
+    b = 50 #number of signature bands
 
     datapoints, _ = vectorize(content_list)
     vectors = [dp.vector for dp in datapoints]
