@@ -128,22 +128,24 @@ def LSH(documents, ids=None, k=3, sign_length=20 , b=2):
 def cosine_sim(a, b):
     return np.dot(a, b)/(norm(a)*norm(b))
 
-def cosine_sim_pairs(names, vectors):
+def similarity_pairs_generator(names, vectors, method):
+    """Generates all possible pairs with their coresponding similarity score
+
+    :param names: The names of the input vectors
+    :type names: list
+    :param vectors: The vectors that are meassured
+    :type vectors: list
+    :param method: The method used to meassure the similarity e.x. Jaccard or Cosine
+    :type method: callable
+    :return: Returns a list with all pairs and their similarity score
+    :rtype: list
+    """    
+
     similarities = []
     for i in range(len(names)):
         for j in range(i):
             id = str(names[i]) + '-' + str(names[j])
-            sim = cosine_sim(vectors[i], vectors[j])
-            similarities.append([id, sim])
-
-    return similarities
-
-def jaccard_sim_pairs(names, vectors):
-    similarities = []
-    for i in range(len(names)):
-        for j in range(i):
-            id = str(names[i]) + '-' + str(names[j])
-            sim = jaccard_binary(vectors[i], vectors[j])
+            sim = method(vectors[i], vectors[j])
             similarities.append([id, sim])
 
     return similarities
@@ -173,8 +175,6 @@ def jaccard_binary(x,y):
     similarity = intersection.sum() / float(union.sum())
     return similarity
 
-
-
 def p(x, r, b):
     return (1 - np.power((1 - np.power(x,r)),b))
 
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     datapoints, _ = vectorize(content_list)
     vectors = [dp.vector for dp in datapoints]
-    cos_results = cosine_sim_pairs(names, vectors)
+    cos_results = similarity_pairs_generator(names, vectors, cosine_sim)
     vectors_bin = np.where(np.array(vectors) > 0, 1, 0)
     jac_results = jaccard_sim_pairs(names, vectors_bin)
     lsh_results = LSH(content_list, names, k=k, sign_length=s , b=b)
