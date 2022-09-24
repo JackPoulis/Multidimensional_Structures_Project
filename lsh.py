@@ -160,6 +160,33 @@ def calc_candidate_pairs(names, sign_matrix):
     return cand_pairs
 
 def LSH(documents, ids=None, k=8, sign_length=100 , b=20):
+    """Produces the LSH results. There are 3 steps. 
+    > First the document is converted to a set of shingles and 
+    using a vocabulary of all shingles the one hot vectors of 
+    each document is generated.
+    > Second the sparse one hot vectors are converted to dense 
+    vectors called signatures.
+    > Third is the LSH algorithm itself that after splitting the
+    signatures into bands checks all possible pairs of
+    documents if they are candidate pairs. Candidate pairs are
+    two documents that have at least one identical band in their 
+    signature.
+
+    :param documents: The input documents
+    :type documents: list
+    :param ids: The ids/names of the documents. If None provided 
+    then a unique number is assigned to each one, defaults to None
+    :type ids: list, optional
+    :param k: The length of the shingles, defaults to 8
+    :type k: int, optional
+    :param sign_length: The length of the signature vector, defaults to 100
+    :type sign_length: int, optional
+    :param b: The number of bands that the signature will be splitted to, defaults to 20
+    :type b: int, optional
+    :return: Returns all possible pairs with the indication if the pair is candidate or not
+    :rtype: list
+    """  
+    #Step 1 ---------------------  
     if ids is None:
         ids = list(range(0,len(documents)))
 
@@ -175,11 +202,13 @@ def LSH(documents, ids=None, k=8, sign_length=100 , b=20):
         one_hot_arrays.append(one_hot(sh, vocab))
     one_hot_arrays = np.array(one_hot_arrays)
 
+    #Step 2 ---------------------
     signatures = []
     permutations = gen_permutations(length, sign_length)
     for oh in one_hot_arrays:
         signatures.append(min_hash(oh, permutations))
-        
+
+    #Step 3 ---------------------   
     sign_matrix = []
     for sign in signatures:
         sign_matrix.append(split_signature(sign, b))
@@ -255,9 +284,11 @@ def p(x, r, b):
 
 if __name__ == "__main__":
 
-    k = 8 #shingles size
-    s = 500 #singature length
-    b = 50 #number of signature bands
+    r = 10
+
+    k = 4 #shingles size
+    s = 1000 #singature length
+    b = int(s/r) #number of signature bands
 
     file_names = list_files(".\\samples\\samples4")
     files_list = [
@@ -285,11 +316,12 @@ if __name__ == "__main__":
     b_axis = [x[1] for x in jac_results]
     c_axis = [1 if x[1]==True else 0 for x in lsh_results]
     p_line = [p(x, s/b, b) for x in linspace]
-    plt.scatter(b_axis, c_axis, s=8)
-    plt.plot(linspace, p_line, color="red")
-    plt.title("LSH candidate pairs")
-    plt.xlabel('Jaccard similarity')
-    plt.ylabel('LSH candidate pairs')
+    plt.scatter(b_axis, c_axis, s=240, alpha=0.1)
+    plt.plot(linspace, p_line, color="red", label=r'Probability=$1-(1-s^{r})^{b}$', linewidth=3)
+    plt.title("LSH results", size=18)
+    plt.xlabel('Jaccard similarity  (s)', size=18)
+    plt.ylabel('LSH candidate pairs', size=18)
     plt.xlim(-0.1,1.1)
     plt.ylim(-0.1,1.1)
+    plt.legend(prop={"size":16}, loc='upper left')
     plt.show()
