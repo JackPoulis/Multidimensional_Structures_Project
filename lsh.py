@@ -97,7 +97,7 @@ def calc_candidate_pairs(names, sign_matrix):
             cand_pairs.append([id, candidate])
     return cand_pairs
 
-def LSH(documents, ids=None, k=3, sign_length=20 , b=2):
+def LSH(documents, ids=None, k=8, sign_length=100 , b=20):
     if ids is None:
         ids = list(range(0,len(documents)))
 
@@ -169,6 +169,11 @@ def jaccard_sim(x: str, y: str):
     union = x_set.union(y_set)
     return len(intersection)/len(union)
 
+def jaccard_set_sim(x: set, y: set):
+    intersection = len(list(set(x).intersection(y)))
+    union = (len(x) + len(y)) - intersection
+    return float(intersection)/union
+
 def jaccard_binary(x,y):
     intersection = np.logical_and(x, y)
     union = np.logical_or(x, y)
@@ -179,8 +184,12 @@ def p(x, r, b):
     return (1 - np.power((1 - np.power(x,r)),b))
 
 if __name__ == "__main__":
-    # file_names = list_files(".\\sample_documents")
-    file_names = list_files(".\\samples\\samples2")
+
+    k = 8 #shingles size
+    s = 200 #singature length
+    b = 50 #number of signature bands
+
+    file_names = list_files(".\\samples\\samples4")
     files_list = [
         open(filename, 'r', encoding='utf-8', errors='ignore') 
         for filename in file_names]
@@ -188,27 +197,23 @@ if __name__ == "__main__":
     names = [f.name for f in files_list]
     # content_list = [preprocess_string(cont) for cont in content_list]
 
-    k = 4 #shingles size
-    s = 100 #singature length
-    b = 50 #number of signature bands
-
-    datapoints, _ = vectorize(content_list)
-    vectors = [dp.vector for dp in datapoints]
-    cos_results = similarity_pairs_generator(names, vectors, cosine_sim)
-    vectors_bin = np.where(np.array(vectors) > 0, 1, 0)
-    jac_results = jaccard_sim_pairs(names, vectors_bin)
+    # datapoints, _ = vectorize(content_list)
+    # vectors = [dp.vector for dp in datapoints]
+    # cos_results = similarity_pairs_generator(names, vectors, cosine_sim)
+    # vectors_bin = np.where(np.array(vectors) > 0, 1, 0)
+    jac_results = similarity_pairs_generator(names, content_list, jaccard_sim)
     lsh_results = LSH(content_list, names, k=k, sign_length=s , b=b)
-    for c,l in zip(cos_results, lsh_results):
-        print(c,l)
+    # for c,l in zip(cos_results, lsh_results):
+        # print(c,l)
     linspace = np.linspace(0,1,100)
-    a_axis = [x[1] for x in cos_results]
+    # a_axis = [x[1] for x in cos_results]
     b_axis = [x[1] for x in jac_results]
     c_axis = [1 if x[1]==True else 0 for x in lsh_results]
     p_line = [p(x, s/b, b) for x in linspace]
-    plt.scatter(a_axis, c_axis, s=8)
+    plt.scatter(b_axis, c_axis, s=8)
     plt.plot(linspace, p_line, color="red")
     plt.title("LSH candidate pairs")
-    plt.xlabel('Cosine similarity')
+    plt.xlabel('Jaccard similarity')
     plt.ylabel('LSH candidate pairs')
     plt.xlim(-0.1,1.1)
     plt.ylim(-0.1,1.1)
