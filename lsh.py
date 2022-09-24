@@ -57,11 +57,36 @@ def one_hot(shingle: set, vocab: list):
     return one_hot_array
 
 def sign_value(one_hot, permutation):
+    """It returns the signature's value that corresponds to the given permutation. 
+    It is used for the min hashing of the vectors
+
+    :param one_hot: The input one hot vector from which we want to generate it's signature
+    :type one_hot: list
+    :param permutation: The random permutation that will yield a value for the signature
+    as described by the min hash algorithm
+    :type permutation: list
+    :return: It returns the min index of the new permuted one hot vector  
+    :rtype: int
+    """    
     indexes = np.nonzero(one_hot)[0]
     value = min(permutation[indexes])
     return value
 
 def gen_permutations(length, k):
+    """Generates the permutations that min hashing will use. A permutation is a list
+    with the same length as the input vectors and have all the integer numbers from 1 
+    to length randomly shuffled.
+
+    :param length: The length of the permutation vector. It must be same as the input 
+    vectors that must be permuted. 
+    :type length: int
+    :param k: The number of permutation vectors to generate.
+    The number of permuations should be at least the same 
+    as the length of the desired signature that min hash generates.
+    :type k: int
+    :return: A list of permutatition vectors
+    :rtype: list
+    """    
     linspace = np.arange(1, length+1, 1)
     permutations = []
     for _ in range(k):
@@ -70,12 +95,36 @@ def gen_permutations(length, k):
     return np.array(permutations)
 
 def min_hash(one_hot, permutations):
+    """The min hash function. It takes a list of one hot vectors and a 
+    list of random permutations andgenerates signatures for every one hot vector. 
+    Every signature represents the one hot vector that generated the signature. 
+    The idea is to take the sparse one hot vectors and make them dense. 
+    If two vectors are similar then their signatures are similar too and the opposite.  
+
+    :param one_hot: The one hot vector from which the signature will be generated.
+    :type one_hot: list
+    :param permutations: The random permutations that will yield every value that make up the signature
+    :type permutations: list
+    :return: The signature of the one hot vector.
+    :rtype: list
+    """    
     signature = []
     for i in range(len(permutations)):
         signature.append(sign_value(one_hot, permutations[i]))
     return signature
 
 def split_signature(sign, b):
+    """Splits the signature into b bands. For example if signature is 100 values long
+    and b is 50 then it will split the singature to 50 bands of 2 values each.
+
+    :param sign: The signature to split
+    :type sign: list
+    :param b: Number of bands
+    :type b: int
+    :raises ValueError: The length of the signature must be divisible by b
+    :return: A matrix that contains the sigature bands
+    :rtype: list
+    """    
     #len(sign)%b should be 0
     if len(sign)%b != 0:
         raise ValueError('b should divide signature\'s length to an integer')
@@ -84,6 +133,19 @@ def split_signature(sign, b):
     return matrix
 
 def calc_candidate_pairs(names, sign_matrix):
+    """Calculates for every possible pair of signatures if they are considered candidate pairs
+    meaning if they have at least one identical band.
+    If that is the case then those enties belong to the same bucket. 
+
+    :param names: The names of the original documents. 
+    The names are used to trace back which signatures belong to the input documents.
+    :type names: list
+    :param sign_matrix: The splitted signatures
+    :type sign_matrix: list
+    :return: A list of all possible pairs with a value TRUE or FALSE that
+    indicates if a pair is cadidate pair or not.
+    :rtype: list
+    """    
     cand_pairs = []
     for i in range(len(names)):
         for j in range(i):
@@ -194,7 +256,7 @@ def p(x, r, b):
 if __name__ == "__main__":
 
     k = 8 #shingles size
-    s = 200 #singature length
+    s = 500 #singature length
     b = 50 #number of signature bands
 
     file_names = list_files(".\\samples\\samples4")
@@ -203,6 +265,11 @@ if __name__ == "__main__":
         for filename in file_names]
     content_list  = [f.read() for f in files_list]
     names = [f.name for f in files_list]
+
+    #trim lists
+    content_list = content_list[:100]
+    names = names[:100]
+
     # content_list = [preprocess_string(cont) for cont in content_list]
 
     # datapoints, _ = vectorize(content_list)
