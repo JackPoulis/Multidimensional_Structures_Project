@@ -316,7 +316,11 @@ if __name__ == "__main__":
     b_axis = [x[1] for x in jac_results]
     c_axis = [1 if x[1]==True else 0 for x in lsh_results]
     p_line = [p(x, s/b, b) for x in linspace]
-    plt.scatter(b_axis, c_axis, s=240, alpha=0.1)
+
+    # plot_text = "Shingle length (k)= " + str(k) + "\nSignature length= " + str(s) + "\nNumber of bands (b)= " + str(b) + "\nNumber of Documents= " + str(len(content_list))
+    plot_text = f'Shingle length (k)= {k}\nSignature length= {s}\nNumber of bands (b)= {b}\nNumber of rows in each band (r)= {int(s/b)}\nNumber of Documents= {len(content_list)}'
+    plt.scatter(b_axis, c_axis, s=240, alpha=0.1, label="Document pairs")
+    plt.text(0, 0.6, plot_text, fontsize = 16)
     plt.plot(linspace, p_line, color="red", label=r'Probability=$1-(1-s^{r})^{b}$', linewidth=3)
     plt.title("LSH results", size=18)
     plt.xlabel('Jaccard similarity  (s)', size=18)
@@ -324,4 +328,5 @@ if __name__ == "__main__":
     plt.xlim(-0.1,1.1)
     plt.ylim(-0.1,1.1)
     plt.legend(prop={"size":16}, loc='upper left')
+    plt.box(False)
     plt.show()
