@@ -175,6 +175,14 @@ def jaccard_set_sim(x: set, y: set):
     return float(intersection)/union
 
 def jaccard_binary(x,y):
+    """
+    A function for finding the similarity between two binary vectors
+    :param x: Binary vector
+    :param y: Binary Vector
+    :intersection: calculates the number of members shared between both vectors
+    :union: calculates the total number of members in both vectors (shared and un-shared)
+    :returns: The similarity rate between the two given binary vectors
+    """
     intersection = np.logical_and(x, y)
     union = np.logical_or(x, y)
     similarity = intersection.sum() / float(union.sum())
