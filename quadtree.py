@@ -1,19 +1,20 @@
 from tools import *
+import numpy as np
 
-class Point:
-    def __init__(self, x, y, payload=None):
-        self.x, self.y = x, y
-        self.payload = payload
+# class Point:
+#     def __init__(self, x, y, payload=None):
+#         self.x, self.y = x, y
+#         self.payload = payload
 
-    def __str__(self):
-        return 'P({:.2f}, {:.2f})'.format(self.x, self.y)
+#     def __str__(self):
+#         return 'P({:.2f}, {:.2f})'.format(self.x, self.y)
 
-    def distance_to(self, other):
-        try:
-            other_x, other_y = other.x, other.y
-        except AttributeError:
-            other_x, other_y = other
-        return np.hypot(self.x - other_x, self.y - other_y)
+#     def distance_to(self, other):
+#         try:
+#             other_x, other_y = other.x, other.y
+#         except AttributeError:
+#             other_x, other_y = other
+#         return np.hypot(self.x - other_x, self.y - other_y)
     
 class Rect:
     
@@ -32,7 +33,7 @@ class Rect:
         
 
         try:
-            point_x, point_y = point.x, point.y
+            point_x, point_y = point.vector[0], point.vector[1]
         except AttributeError:
             point_x, point_y = point
 
@@ -93,7 +94,7 @@ class QuadTree:
                                     self.max_points, self.depth + 1)
         self.divided = True
 
-    def insert(self, point: Point):
+    def insert(self, point: Datapoint):
         
 
         if not self.boundary.contains(point):
