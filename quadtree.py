@@ -1,23 +1,7 @@
 from tools import *
 import numpy as np
-
-# class Point:
-#     def __init__(self, x, y, payload=None):
-#         self.x, self.y = x, y
-#         self.payload = payload
-
-#     def __str__(self):
-#         return 'P({:.2f}, {:.2f})'.format(self.x, self.y)
-
-#     def distance_to(self, other):
-#         try:
-#             other_x, other_y = other.x, other.y
-#         except AttributeError:
-#             other_x, other_y = other
-#         return np.hypot(self.x - other_x, self.y - other_y)
     
 class Rect:
-    
 
     def __init__(self, cx, cy, w, h):
         self.cx, self.cy = cx, cy
@@ -31,14 +15,13 @@ class Rect:
 
     def contains(self, point):
         
-
         try:
             point_x, point_y = point.vector[0], point.vector[1]
         except AttributeError:
             point_x, point_y = point
 
         return (point_x >= self.west_edge and
-                point_x <  self.east_edge and
+                point_x < self.east_edge and
                 point_y >= self.north_edge and
                 point_y < self.south_edge)
 
@@ -56,16 +39,18 @@ class Rect:
         
 class QuadTree:
     
-
-    def __init__(self, boundary: Rect, max_points=4, depth=0):
+    def __init__(self, boundary: Rect, datapoints: Datapoint = None, max_points=4, depth=0):
        
-
         self.boundary = boundary
         self.max_points = max_points
         self.points = []
         self.depth = depth
         
         self.divided = False
+
+        if datapoints:
+            for point in datapoints:
+                self.insert(point)
 
     def __str__(self):
        
@@ -80,7 +65,6 @@ class QuadTree:
 
     def divide(self):
         
-
         cx, cy = self.boundary.cx, self.boundary.cy
         w, h = self.boundary.w / 2, self.boundary.h / 2
         
@@ -94,9 +78,8 @@ class QuadTree:
                                     self.max_points, self.depth + 1)
         self.divided = True
 
-    def insert(self, point: Datapoint):
+    def insert(self, point):
         
-
         if not self.boundary.contains(point):
             return False
 
@@ -104,7 +87,6 @@ class QuadTree:
             self.points.append(point)
             return True
 
-        
         if not self.divided:
             self.divide()
 
@@ -115,11 +97,9 @@ class QuadTree:
 
     def query(self, boundary, found_points):
        
-
         if not self.boundary.intersects(boundary): 
             return False
 
-        
         for point in self.points:
             if boundary.contains(point):
                 found_points.append(point)
@@ -132,6 +112,8 @@ class QuadTree:
         return found_points
     
 if __name__ == "__main__":
+    dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
+    datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     bound = Rect(0,0,10,10)
-    tree = QuadTree(bound)
+    tree = QuadTree(bound, datapoints)
     print(tree)
