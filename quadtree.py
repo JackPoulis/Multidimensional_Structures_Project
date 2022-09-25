@@ -32,13 +32,13 @@ class QuadTree:
         w, h = self.boundary.w / 2, self.boundary.h / 2
         
         self.nw = QuadTree(Rect(cx - w/2, cy - h/2, w, h),
-                                    self.max_points, self.depth + 1)
+                                    max_points = self.max_points, depth = self.depth + 1)
         self.ne = QuadTree(Rect(cx + w/2, cy - h/2, w, h),
-                                    self.max_points, self.depth + 1)
+                                    max_points = self.max_points, depth = self.depth + 1)
         self.se = QuadTree(Rect(cx + w/2, cy + h/2, w, h),
-                                    self.max_points, self.depth + 1)
+                                    max_points = self.max_points, depth = self.depth + 1)
         self.sw = QuadTree(Rect(cx - w/2, cy + h/2, w, h),
-                                    self.max_points, self.depth + 1)
+                                    max_points = self.max_points, depth = self.depth + 1)
         self.divided = True
 
     def insert(self, point):
