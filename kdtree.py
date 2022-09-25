@@ -116,8 +116,8 @@ if __name__ == "__main__":
     dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,7]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
-    # print(tree)
+    print(tree)
     # results = tree.range_search([[0,10],[0,10]])
     # for node in results:
     #     print(node)
-    print(tree.search([9,1]))
+    # print(tree.search([9,1]))
