@@ -205,8 +205,40 @@ def intersection(region_a, region_b):
 
     return new_region
 
+def compress(datapoints):
+    """Groups points with same coordinates into one Datapoint that
+    includes all points ids to avoid duplicate points
+
+    :param datapoints: The input datapoints list to compress
+    :type datapoints: list
+    :return: The list of datapoints with no duplicates
+    :rtype: list
+    """    
+    
+    length = len(datapoints)
+    i = 0
+    j = length - 1
+    while i < length:
+        while j > i:
+            if datapoints[i].vector == datapoints[j].vector:
+                datapoints[i].id += ", " + datapoints[j].id
+                del datapoints[j]
+                length -= 1
+                i -= 1
+                break
+            print(i,j)
+            j -= 1
+        j = length - 1 
+        i += 1
+        
+    return datapoints
+
 if __name__ == "__main__":
     # file_names = list_files(".\\sample_documents")
     # input_list = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in file_names]
     # results = vectorize(input_list, input='file')
-    pass
+    dictionary = {'a':[6,5],'b':[6,5],'c':[5,5],'d':[5,5],'e':[6,5],'f':[6,5],'g':[6,5]}
+    datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
+    datapoints = compress(datapoints)
+    for p in datapoints:
+        print(p)
