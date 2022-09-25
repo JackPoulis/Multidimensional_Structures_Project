@@ -15,30 +15,19 @@ class QuadTree:
             for point in datapoints:
                 self.insert(point)
 
-    def __str__(self):
-       
-        sp = ' ' * self.depth * 2
-        s = str(self.boundary) + '\n'
-        s += sp + ', '.join(str(point) for point in self.points)
-        if not self.divided:
-            return s
-        return s + '\n' + '\n'.join([
-                sp + 'nw: ' + str(self.nw), sp + 'ne: ' + str(self.ne),
-                sp + 'se: ' + str(self.se), sp + 'sw: ' + str(self.sw)])
-
     def divide(self):
         
         cx, cy = self.boundary.cx, self.boundary.cy
         w, h = self.boundary.w / 2, self.boundary.h / 2
         
         self.nw = QuadTree(Rect(cx - w/2, cy - h/2, w, h),
-                                    max_points = self.max_points, depth = self.depth + 1)
+            max_points = self.max_points, depth = self.depth + 1)
         self.ne = QuadTree(Rect(cx + w/2, cy - h/2, w, h),
-                                    max_points = self.max_points, depth = self.depth + 1)
+            max_points = self.max_points, depth = self.depth + 1)
         self.se = QuadTree(Rect(cx + w/2, cy + h/2, w, h),
-                                    max_points = self.max_points, depth = self.depth + 1)
+            max_points = self.max_points, depth = self.depth + 1)
         self.sw = QuadTree(Rect(cx - w/2, cy + h/2, w, h),
-                                    max_points = self.max_points, depth = self.depth + 1)
+            max_points = self.max_points, depth = self.depth + 1)
         self.divided = True
 
     def insert(self, point):
@@ -74,6 +63,27 @@ class QuadTree:
             self.sw.query(boundary, found_points)
         return found_points
     
+    def __str__(self):
+       
+        sp = ' ' * self.depth * 2
+        s = str(self.boundary) + '\n'
+        s += sp + ', '.join(str(point) for point in self.points)
+        if not self.divided:
+            return s
+        return s + '\n' + '\n'.join([
+                sp + 'nw: ' + str(self.nw), sp + 'ne: ' + str(self.ne),
+                sp + 'se: ' + str(self.se), sp + 'sw: ' + str(self.sw)])
+
+    def size(self):
+        size = 0
+        if not self.divided:
+            return 1
+
+        for child in [self.nw, self.ne, self.se, self.sw]:
+            size += child.size()
+
+        return size
+
 if __name__ == "__main__":
     dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
