@@ -214,7 +214,7 @@ def compress(datapoints):
     :return: The list of datapoints with no duplicates
     :rtype: list
     """    
-    
+
     length = len(datapoints)
     i = 0
     j = length - 1
@@ -226,7 +226,6 @@ def compress(datapoints):
                 length -= 1
                 i -= 1
                 break
-            print(i,j)
             j -= 1
         j = length - 1 
         i += 1
