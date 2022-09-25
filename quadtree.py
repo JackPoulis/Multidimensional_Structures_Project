@@ -5,8 +5,6 @@ class Point:
         self.x, self.y = x, y
         self.payload = payload
 
-    def __repr__(self):
-        return '{}: {}'.format(str((self.x, self.y)), repr(self.payload))
     def __str__(self):
         return 'P({:.2f}, {:.2f})'.format(self.x, self.y)
 
@@ -25,10 +23,6 @@ class Rect:
         self.w, self.h = w, h
         self.west_edge, self.east_edge = cx - w/2, cx + w/2
         self.north_edge, self.south_edge = cy - h/2, cy + h/2
-
-    def __repr__(self):
-        return str((self.west_edge, self.east_edge, self.north_edge,
-                self.south_edge))
 
     def __str__(self):
         return '({:.2f}, {:.2f}, {:.2f}, {:.2f})'.format(self.west_edge,
@@ -62,7 +56,7 @@ class Rect:
 class QuadTree:
     
 
-    def __init__(self, boundary, max_points=4, depth=0):
+    def __init__(self, boundary: Rect, max_points=4, depth=0):
        
 
         self.boundary = boundary
@@ -99,14 +93,13 @@ class QuadTree:
                                     self.max_points, self.depth + 1)
         self.divided = True
 
-    def insert(self, point):
+    def insert(self, point: Point):
         
 
         if not self.boundary.contains(point):
-            
             return False
+
         if len(self.points) < self.max_points:
-            
             self.points.append(point)
             return True
 
@@ -137,3 +130,7 @@ class QuadTree:
             self.sw.query(boundary, found_points)
         return found_points
     
+if __name__ == "__main__":
+    bound = Rect(0,0,10,10)
+    tree = QuadTree(bound)
+    print(tree)
