@@ -1,4 +1,4 @@
-import numpy as np
+from tools import *
 
 class Point:
     def __init__(self, x, y, payload=None):
