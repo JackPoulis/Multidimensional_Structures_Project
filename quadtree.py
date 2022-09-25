@@ -1,5 +1,4 @@
 from tools import *
-import numpy as np
     
 class Rect:
 
