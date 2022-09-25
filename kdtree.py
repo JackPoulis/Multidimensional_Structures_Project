@@ -13,7 +13,7 @@ class KDTree():
         self.root = self.build(datapoints)
 
     def build(self, datapoints: Datapoint = None, depth = 0) -> Node:
-        # We assumed all datapoints have diferent positions 
+        # We assume all datapoints have different positions 
         if datapoints == None or len(datapoints) == 0:
             return None
 
@@ -112,11 +112,26 @@ class KDTree():
 
         return string
 
+    def size(self, node: Node = None) -> int:
+        if self.root == None:
+            return 0
+
+        size = 1
+        if node is None:
+            node = self.root
+
+        for child in [node.left_child, node.right_child]:
+            if child:
+                size += self.size(child)
+
+        return size
+
 if __name__ == "__main__":
-    dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,7]}
+    dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,9]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
     print(tree)
+    print(tree.size())
     # results = tree.range_search([[0,10],[0,10]])
     # for node in results:
     #     print(node)

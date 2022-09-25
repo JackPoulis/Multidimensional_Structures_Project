@@ -222,11 +222,31 @@ class RangeTree():
 
         return string
 
+    def size(self, node: Node = None) -> str:
+        if self.root == None:
+            return 0
+
+        if node is None:
+            node = self.root
+        
+        size = 1
+
+        for child in [node.left_child, node.right_child]:
+            if child:
+                size += self.size(child)
+        
+        if node.subtree:
+            size += node.subtree.size()
+
+        return size
+
 if __name__ == "__main__":
-    dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
+    # dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
+    dictionary = {'a':[1,1],'b':[2,4],'c':[3,1]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = RangeTree(datapoints)
     print(str(tree))
+    print(tree.size())
     # results = tree.range_search([[1,5],[1,5]])
     # for node in results:
     #     print(node.datapoint)
