@@ -241,10 +241,11 @@ class RangeTree():
         return size
 
 if __name__ == "__main__":
-    dictionary = {'a':[1,4,2],'b':[3,6,2],'c':[4,2,2],'d':[2,9,8],'e':[5,8,4],'f':[9,1,7],'g':[6,5,9],'h':[10,3,8],'i':[7,9,3],'j':[8,9,3]}
+    dictionary = {'a':[1,4,2],'b':[3,6,2],'c':[4,2,2],'d':[2,9,8],'e':[5,8,4]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = RangeTree(datapoints)
 
+    print("Tree: Range tree")
     print("Input Datapoints: ")
     [print(p) for p in datapoints]
 

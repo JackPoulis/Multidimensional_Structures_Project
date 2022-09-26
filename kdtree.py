@@ -131,6 +131,7 @@ if __name__ == "__main__":
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
 
+    print("Tree: KD tree")
     print("Input Datapoints: ")
     [print(p) for p in datapoints]
 

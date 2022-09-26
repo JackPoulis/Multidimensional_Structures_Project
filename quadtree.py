@@ -94,6 +94,7 @@ if __name__ == "__main__":
     boundary = Rect(math.ceil(mbr[0][1]/2), math.ceil(mbr[1][1]/2), mbr[0][1]-mbr[0][0]+1, mbr[1][1]-mbr[1][0]+1)
     tree = QuadTree(boundary, datapoints)
 
+    print("Tree: Quad tree")
     print("Input Datapoints: ")
     [print(p) for p in datapoints]
 
