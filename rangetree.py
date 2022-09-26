@@ -241,14 +241,19 @@ class RangeTree():
         return size
 
 if __name__ == "__main__":
-    # dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
-    dictionary = {'a':[1,1],'b':[2,4],'c':[3,1]}
+    dictionary = {'a':[1,4,2],'b':[3,6,2],'c':[4,2,2],'d':[2,9,8],'e':[5,8,4],'f':[9,1,7],'g':[6,5,9],'h':[10,3,8],'i':[7,9,3],'j':[8,9,3]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = RangeTree(datapoints)
-    print(str(tree))
-    print(tree.size())
-    # results = tree.range_search([[1,5],[1,5]])
-    # for node in results:
-    #     print(node.datapoint)
-    #     print(node.axis)
-    # print(tree.search([2,4]))
+
+    print("Input Datapoints: ")
+    [print(p) for p in datapoints]
+
+    print("The constructed tree: ")
+    print(tree)
+    print("Tree size:" , tree.size())
+
+    search_area = [[3,7],[2,9],[0,5]]
+    print("The result when searching in area: " + str(search_area))
+    found_points = tree.range_search(search_area)
+    for p in found_points:
+        print(p)

@@ -267,7 +267,7 @@ if __name__ == "__main__":
 
     r = 10
 
-    k = 4 #shingles size
+    k = 8 #shingles size
     s = 1000 #singature length
     b = int(s/r) #number of signature bands
 
@@ -298,7 +298,6 @@ if __name__ == "__main__":
     c_axis = [1 if x[1]==True else 0 for x in lsh_results]
     p_line = [p(x, s/b, b) for x in linspace]
 
-    # plot_text = "Shingle length (k)= " + str(k) + "\nSignature length= " + str(s) + "\nNumber of bands (b)= " + str(b) + "\nNumber of Documents= " + str(len(content_list))
     plot_text = f'Shingle length (k)= {k}\nSignature length= {s}\nNumber of bands (b)= {b}\nNumber of rows in each band (r)= {int(s/b)}\nNumber of Documents= {len(content_list)}'
     plt.scatter(b_axis, c_axis, s=240, alpha=0.1, label="Document pairs")
     plt.text(0, 0.6, plot_text, fontsize = 16)

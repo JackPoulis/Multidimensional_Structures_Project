@@ -127,12 +127,19 @@ class KDTree():
         return size
 
 if __name__ == "__main__":
-    dictionary = {'p1':[1,4],'p2':[3,6],'p3':[4,2],'p4':[2,9],'p5':[5,8],'p6':[9,1],'p7':[6,5],'p8':[10,3],'p9':[7,9],'p10':[8,9]}
+    dictionary = {'a':[1,4],'b':[3,6],'c':[4,2],'d':[2,9],'e':[5,8],'f':[9,1],'g':[6,5],'h':[10,3],'i':[7,9],'j':[8,9]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
     tree = KDTree(datapoints)
+
+    print("Input Datapoints: ")
+    [print(p) for p in datapoints]
+
+    print("The constructed tree: ")
     print(tree)
-    print(tree.size())
-    # results = tree.range_search([[0,10],[0,10]])
-    # for node in results:
-    #     print(node)
-    # print(tree.search([9,1]))
+    print("Tree size:" , tree.size())
+
+    search_area = [[3,7],[2,9]]
+    print("The result when searching in area: " + str(search_area))
+    found_points = tree.range_search(search_area)
+    for p in found_points:
+        print(p)

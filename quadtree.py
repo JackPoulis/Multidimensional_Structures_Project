@@ -93,7 +93,17 @@ if __name__ == "__main__":
     mbr = calc_mbr(datapoints)
     boundary = Rect(math.ceil(mbr[0][1]/2), math.ceil(mbr[1][1]/2), mbr[0][1]-mbr[0][0]+1, mbr[1][1]-mbr[1][0]+1)
     tree = QuadTree(boundary, datapoints)
-    # f_points = []
-    f_points = tree.range_search(boundary)
-    for p in f_points:
+
+    print("Input Datapoints: ")
+    [print(p) for p in datapoints]
+
+    print("The constructed tree: ")
+    print(tree)
+    print("Tree size:" , tree.size())
+
+    search_area = [[3,7],[7,3]]
+    search_boundary = Rect(5, 5, 4, 4)
+    print("The result when searching in area: " + str(search_area))
+    found_points = tree.range_search(search_boundary)
+    for p in found_points:
         print(p)
