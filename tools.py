@@ -127,11 +127,6 @@ class Rect:
                     other.north_edge > self.south_edge or
                     other.south_edge < self.north_edge)
 
-    def draw(self, ax, c='k', lw=1, **kwargs):
-        x1, y1 = self.west_edge, self.north_edge
-        x2, y2 = self.east_edge, self.south_edge
-        ax.plot([x1,x2,x2,x1,x1],[y1,y1,y2,y2,y1], c=c, lw=lw, **kwargs)    
-
 def extract_leafs(node: Node):
     """Takes a node of a tree/subtree and returns 
     all the leaf nodes below that node
@@ -271,9 +266,9 @@ def compress(datapoints):
         
     return datapoints
 
-def rangetree_space_complexity(n, factor=3): #Bernard Chazelle complexity
+def rangetree_space_complexity(n, factor=3, dimensions=2): #Bernard Chazelle complexity
     base = math.log(n, 2)/math.log(math.log(n,2),2) 
-    return factor*(n*math.pow(base,(d-1)))
+    return factor*(n*math.pow(base,(dimensions-1)))
 
 def kdtree_space_complexity(n, factor=4): #O(n)
     return factor*n
