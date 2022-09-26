@@ -265,13 +265,13 @@ def p(x, r, b):
 
 if __name__ == "__main__":
 
-    r = 10
+    r = 10 #number of rows in each band
 
     k = 8 #shingles size
     s = 1000 #singature length
     b = int(s/r) #number of signature bands
 
-    file_names = list_files(".\\samples\\samples4")
+    file_names = list_files(".\\samples\\samples2")
     files_list = [
         open(filename, 'r', encoding='utf-8', errors='ignore') 
         for filename in file_names]
@@ -282,18 +282,9 @@ if __name__ == "__main__":
     content_list = content_list[:100]
     names = names[:100]
 
-    # content_list = [preprocess_string(cont) for cont in content_list]
-
-    # datapoints, _ = vectorize(content_list)
-    # vectors = [dp.vector for dp in datapoints]
-    # cos_results = similarity_pairs_generator(names, vectors, cosine_sim)
-    # vectors_bin = np.where(np.array(vectors) > 0, 1, 0)
     jac_results = similarity_pairs_generator(names, content_list, jaccard_sim)
     lsh_results = LSH(content_list, names, k=k, sign_length=s , b=b)
-    # for c,l in zip(cos_results, lsh_results):
-        # print(c,l)
     linspace = np.linspace(0,1,100)
-    # a_axis = [x[1] for x in cos_results]
     b_axis = [x[1] for x in jac_results]
     c_axis = [1 if x[1]==True else 0 for x in lsh_results]
     p_line = [p(x, s/b, b) for x in linspace]

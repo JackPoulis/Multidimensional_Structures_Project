@@ -275,13 +275,3 @@ def kdtree_space_complexity(n, factor=4): #O(n)
 
 def quadtree_space_complexity(n, factor=1/2): #O(n)
     return factor*n
-
-if __name__ == "__main__":
-    # file_names = list_files(".\\sample_documents")
-    # input_list = [open(filename, 'r', encoding='utf-8', errors='ignore') for filename in file_names]
-    # results = vectorize(input_list, input='file')
-    dictionary = {'a':[6,5],'b':[6,5],'c':[5,5],'d':[5,5],'e':[6,5],'f':[6,5],'g':[6,5]}
-    datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
-    datapoints = compress(datapoints)
-    for p in datapoints:
-        print(p)
