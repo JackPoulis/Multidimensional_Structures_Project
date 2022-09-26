@@ -47,8 +47,11 @@ class QuadTree:
                 self.se.insert(point) or
                 self.sw.insert(point))
 
-    def query(self, boundary, found_points):
-       
+    def range_search(self, boundary, found_points=None):
+
+        if not found_points:
+            found_points = []
+
         if not self.boundary.intersects(boundary): 
             return False
 
@@ -57,10 +60,10 @@ class QuadTree:
                 found_points.append(point)
         
         if self.divided:
-            self.nw.query(boundary, found_points)
-            self.ne.query(boundary, found_points)
-            self.se.query(boundary, found_points)
-            self.sw.query(boundary, found_points)
+            self.nw.range_search(boundary, found_points)
+            self.ne.range_search(boundary, found_points)
+            self.se.range_search(boundary, found_points)
+            self.sw.range_search(boundary, found_points)
         return found_points
     
     def __str__(self):
@@ -85,8 +88,12 @@ class QuadTree:
         return size
 
 if __name__ == "__main__":
-    dictionary = {'a':[1,1],'b':[2,4],'c':[3,1],'d':[4,3],'e':[5,6],'f':[6,5]}
+    dictionary = {'a':[1,4],'b':[3,6],'c':[4,2],'d':[2,9],'e':[5,8],'f':[9,1],'g':[6,5],'h':[10,3],'i':[7,9],'j':[8,9]}
     datapoints = [Datapoint(d[1],d[0]) for d in dictionary.items()]
-    bound = Rect(0,0,10,10)
-    tree = QuadTree(bound, datapoints)
-    print(tree)
+    mbr = calc_mbr(datapoints)
+    boundary = Rect(math.ceil(mbr[0][1]/2), math.ceil(mbr[1][1]/2), mbr[0][1]-mbr[0][0]+1, mbr[1][1]-mbr[1][0]+1)
+    tree = QuadTree(boundary, datapoints)
+    # f_points = []
+    f_points = tree.range_search(boundary)
+    for p in f_points:
+        print(p)
