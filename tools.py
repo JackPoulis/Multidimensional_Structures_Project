@@ -1,10 +1,13 @@
 import os
 import nltk
+import math
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
+#In case nltk package stopwords are not downloaded  
+#run the below commands once
 # try:
 #     nltk.data.find('tokenizers/stopwords')
 # except LookupError:
@@ -267,6 +270,16 @@ def compress(datapoints):
         i += 1
         
     return datapoints
+
+def rangetree_space_complexity(n, factor=3): #Bernard Chazelle complexity
+    base = math.log(n, 2)/math.log(math.log(n,2),2) 
+    return factor*(n*math.pow(base,(d-1)))
+
+def kdtree_space_complexity(n, factor=4): #O(n)
+    return factor*n
+
+def quadtree_space_complexity(n, factor=1/2): #O(n)
+    return factor*n
 
 if __name__ == "__main__":
     # file_names = list_files(".\\sample_documents")
